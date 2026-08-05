@@ -12,7 +12,7 @@ import (
 
 // TestSSHDeployCustomFilename 验证自定义证书/私钥文件名:部署到指定文件名而非默认名。
 func TestSSHDeployCustomFilename(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
+	srv, keyPath, khPath := startSSHServer(t)
 	host, port, err := net.SplitHostPort(srv.addr)
 	if err != nil {
 		t.Fatal(err)
@@ -24,6 +24,7 @@ func TestSSHDeployCustomFilename(t *testing.T) {
 		Port:         p,
 		User:         "test",
 		Key:          keyPath,
+		KnownHosts:   khPath,
 		RemotePath:   srv.dir,
 		ReloadCmd:    "nginx -s reload",
 		CertFilename: "aijijie.com_bundle.crt",

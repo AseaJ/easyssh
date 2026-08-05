@@ -24,6 +24,7 @@ import (
 
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/knownhosts"
 
 	"go-zs/internal/certmgr"
 	"go-zs/internal/config"
@@ -40,7 +41,7 @@ type sshTestServer struct {
 	failCmd   bool
 }
 
-func startSSHServer(t *testing.T) (*sshTestServer, string) {
+func startSSHServer(t *testing.T) (srv *sshTestServer, keyPath string, khPath string) {
 	t.Helper()
 	hostKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
@@ -60,7 +61,7 @@ func startSSHServer(t *testing.T) (*sshTestServer, string) {
 		t.Fatal(err)
 	}
 
-	srv := &sshTestServer{clientKey: clientSigner, dir: t.TempDir()}
+	srv = &sshTestServer{clientKey: clientSigner, dir: t.TempDir()}
 	config := &ssh.ServerConfig{
 		PublicKeyCallback: func(conn ssh.ConnMetadata, key ssh.PublicKey) (*ssh.Permissions, error) {
 			if string(key.Marshal()) == string(clientSigner.PublicKey().Marshal()) {
@@ -87,13 +88,20 @@ func startSSHServer(t *testing.T) (*sshTestServer, string) {
 	}()
 	t.Cleanup(func() { ln.Close() })
 
-	keyPath := filepath.Join(t.TempDir(), "id_test")
+	keyPath = filepath.Join(t.TempDir(), "id_test")
 	der, _ := x509.MarshalECPrivateKey(clientKey)
 	keyPEM := pem.EncodeToMemory(&pem.Block{Type: "EC PRIVATE KEY", Bytes: der})
 	if err := os.WriteFile(keyPath, keyPEM, 0o600); err != nil {
 		t.Fatal(err)
 	}
-	return srv, keyPath
+
+	// 生成与测试服务器匹配的 known_hosts 文件(供客户端严格校验)
+	khPath = filepath.Join(t.TempDir(), "known_hosts")
+	khLine := knownhosts.Line([]string{knownhosts.Normalize(srv.addr)}, hostSigner.PublicKey())
+	if err := os.WriteFile(khPath, []byte(khLine+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return srv, keyPath, khPath
 }
 
 func (s *sshTestServer) handleConn(config *ssh.ServerConfig, conn net.Conn) {
@@ -224,7 +232,7 @@ func sshBundle() *certmgr.Bundle {
 	}
 }
 
-func sshDeployer(t *testing.T, srv *sshTestServer, keyPath, reloadCmd string) *SSH {
+func sshDeployer(t *testing.T, srv *sshTestServer, keyPath, khPath, reloadCmd string) *SSH {
 	t.Helper()
 	host, port, err := net.SplitHostPort(srv.addr)
 	if err != nil {
@@ -237,6 +245,7 @@ func sshDeployer(t *testing.T, srv *sshTestServer, keyPath, reloadCmd string) *S
 		Port:       p,
 		User:       "test",
 		Key:        keyPath,
+		KnownHosts: khPath,
 		RemotePath: srv.dir,
 		ReloadCmd:  reloadCmd,
 		Timeout:    10 * time.Second,
@@ -248,11 +257,11 @@ func sshDeployer(t *testing.T, srv *sshTestServer, keyPath, reloadCmd string) *S
 }
 
 func TestMockStdout(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
+	srv, keyPath, khPath := startSSHServer(t)
 	host, port, _ := net.SplitHostPort(srv.addr)
 	var p int
 	fmt.Sscanf(port, "%d", &p)
-	s := &SSH{cfg: SSHConfig{Host: host, Port: p, User: "test", Key: keyPath, RemotePath: srv.dir, Timeout: 10 * time.Second}}
+	s := &SSH{cfg: SSHConfig{Host: host, Port: p, User: "test", Key: keyPath, KnownHosts: khPath, RemotePath: srv.dir, Timeout: 10 * time.Second}}
 	client, err := s.dial(context.Background())
 	if err != nil {
 		t.Fatal(err)
@@ -268,8 +277,8 @@ func TestMockStdout(t *testing.T) {
 }
 
 func TestSSHDeploySuccess(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
-	d := sshDeployer(t, srv, keyPath, "nginx -t && nginx -s reload")
+	srv, keyPath, khPath := startSSHServer(t)
+	d := sshDeployer(t, srv, keyPath, khPath, "nginx -t && nginx -s reload")
 	b := sshBundle()
 
 	if err := d.Deploy(context.Background(), b); err != nil {
@@ -299,8 +308,8 @@ func TestSSHDeploySuccess(t *testing.T) {
 }
 
 func TestSSHDeployIdempotent(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
-	d := sshDeployer(t, srv, keyPath, "nginx -s reload")
+	srv, keyPath, khPath := startSSHServer(t)
+	d := sshDeployer(t, srv, keyPath, khPath, "nginx -s reload")
 
 	b := sshBundle()
 	b.Meta.DeployedFingerprint = b.Fingerprint
@@ -317,7 +326,7 @@ func TestSSHDeployIdempotent(t *testing.T) {
 }
 
 func TestSSHDeployReloadFailRollback(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
+	srv, keyPath, khPath := startSSHServer(t)
 	oldCert := []byte("OLD REMOTE CERT")
 	os.WriteFile(filepath.Join(srv.dir, "fullchain.pem"), oldCert, 0o644)
 
@@ -325,7 +334,7 @@ func TestSSHDeployReloadFailRollback(t *testing.T) {
 	srv.failCmd = true
 	srv.mu.Unlock()
 
-	d := sshDeployer(t, srv, keyPath, "nginx -t && nginx -s reload")
+	d := sshDeployer(t, srv, keyPath, khPath, "nginx -t && nginx -s reload")
 	err := d.Deploy(context.Background(), sshBundle())
 	if err == nil {
 		t.Fatal("远程命令失败应返回错误")
@@ -391,13 +400,13 @@ func TestWebhookDeployer(t *testing.T) {
 }
 
 func TestPingOK(t *testing.T) {
-	srv, keyPath := startSSHServer(t)
+	srv, keyPath, khPath := startSSHServer(t)
 	host, portStr, err := net.SplitHostPort(srv.addr)
 	if err != nil {
 		t.Fatal(err)
 	}
 	port, _ := strconv.Atoi(portStr)
-	if err := Ping(context.Background(), SSHConfig{Host: host, Port: port, User: "test", Key: keyPath}); err != nil {
+	if err := Ping(context.Background(), SSHConfig{Host: host, Port: port, User: "test", Key: keyPath, KnownHosts: khPath}); err != nil {
 		t.Fatalf("Ping 应成功: %v", err)
 	}
 }
@@ -414,5 +423,64 @@ func TestPingConnectionRefused(t *testing.T) {
 	port, _ := strconv.Atoi(portStr)
 	if err := Ping(context.Background(), SSHConfig{Host: host, Port: port, User: "u", Key: "/nonexistent"}); err == nil {
 		t.Fatal("连接拒绝应报错")
+	}
+}
+
+// TestKnownHostsRequired:未配置 known_hosts 必须拒绝连接(安全默认)。
+func TestKnownHostsRequired(t *testing.T) {
+	srv, keyPath, _ := startSSHServer(t)
+	host, portStr, err := net.SplitHostPort(srv.addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	port, _ := strconv.Atoi(portStr)
+	err = Ping(context.Background(), SSHConfig{Host: host, Port: port, User: "test", Key: keyPath})
+	if err == nil {
+		t.Fatal("未配置 known_hosts 应拒绝连接(防中间人)")
+	}
+	if !strings.Contains(err.Error(), "known_hosts") {
+		t.Errorf("错误信息应说明需要 known_hosts: %v", err)
+	}
+}
+
+// TestKnownHostsMismatch:known_hosts 中的指纹与服务器不匹配时必须拒绝。
+func TestKnownHostsMismatch(t *testing.T) {
+	srv, keyPath, _ := startSSHServer(t)
+	// 生成一个"错误"的 known_hosts(随机密钥,与服务器不符)
+	otherKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	otherSigner, err := ssh.NewSignerFromKey(otherKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	khPath := filepath.Join(t.TempDir(), "known_hosts_wrong")
+	line := knownhosts.Line([]string{knownhosts.Normalize(srv.addr)}, otherSigner.PublicKey())
+	if err := os.WriteFile(khPath, []byte(line+"\n"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	host, portStr, err := net.SplitHostPort(srv.addr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	port, _ := strconv.Atoi(portStr)
+	err = Ping(context.Background(), SSHConfig{Host: host, Port: port, User: "test", Key: keyPath, KnownHosts: khPath})
+	if err == nil {
+		t.Fatal("known_hosts 指纹不匹配应拒绝连接")
+	}
+}
+
+// TestHostKeyCallbackNoKnownHosts:hostKeyCallback 在未配置时直接报错,不发起网络连接。
+func TestHostKeyCallbackNoKnownHosts(t *testing.T) {
+	s := &SSH{cfg: SSHConfig{Host: "h", User: "u"}}
+	if _, err := s.hostKeyCallback(); err == nil {
+		t.Fatal("未配置 known_hosts 应返回错误")
+	}
+	// 配置不存在的 known_hosts 文件也应报错
+	s2 := &SSH{cfg: SSHConfig{Host: "h", User: "u", KnownHosts: "/nonexistent/known_hosts"}}
+	if _, err := s2.hostKeyCallback(); err == nil {
+		t.Fatal("known_hosts 文件不存在应报错")
 	}
 }

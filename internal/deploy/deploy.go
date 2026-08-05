@@ -40,7 +40,7 @@ func NewDeployer(cfg config.DeployConfig, hosts []config.HostConfig) (Deployer, 
 func newSSHDeployer(cfg config.DeployConfig, hosts []config.HostConfig) (Deployer, error) {
 	base := config.HostConfig{
 		Host: cfg.Host, Port: cfg.Port, User: cfg.User,
-		Key: cfg.Key, RemotePath: cfg.RemotePath, ReloadCmd: cfg.ReloadCmd,
+		Key: cfg.Key, KnownHosts: cfg.KnownHosts, RemotePath: cfg.RemotePath, ReloadCmd: cfg.ReloadCmd,
 		CertFilename: cfg.CertFilename, KeyFilename: cfg.KeyFilename,
 	}
 	if cfg.HostRef != "" {
@@ -59,6 +59,9 @@ func newSSHDeployer(cfg config.DeployConfig, hosts []config.HostConfig) (Deploye
 				}
 				if base.Key == "" {
 					base.Key = h.Key
+				}
+				if base.KnownHosts == "" {
+					base.KnownHosts = h.KnownHosts
 				}
 				if base.RemotePath == "" {
 					base.RemotePath = h.RemotePath
@@ -88,6 +91,7 @@ func newSSHDeployer(cfg config.DeployConfig, hosts []config.HostConfig) (Deploye
 		Port:         base.Port,
 		User:         base.User,
 		Key:          base.Key,
+		KnownHosts:   base.KnownHosts,
 		RemotePath:   base.RemotePath,
 		ReloadCmd:    base.ReloadCmd,
 		CertFilename: base.CertFilename,

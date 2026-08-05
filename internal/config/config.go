@@ -79,6 +79,7 @@ type HostConfig struct {
 	Port         int    `yaml:"port,omitempty"`
 	User         string `yaml:"user"`
 	Key          string `yaml:"key,omitempty"`
+	KnownHosts   string `yaml:"known_hosts,omitempty"` // known_hosts 路径(推荐;为空则拒绝连接)
 	RemotePath   string `yaml:"remote_path,omitempty"`
 	ReloadCmd    string `yaml:"reload_cmd,omitempty"`
 	CertFilename string `yaml:"cert_filename,omitempty"` // 可选:远程证书文件名(默认 fullchain.pem)
@@ -171,6 +172,7 @@ type DeployConfig struct {
 	Port         int    `yaml:"port,omitempty"`
 	User         string `yaml:"user,omitempty"`
 	Key          string `yaml:"key,omitempty"`
+	KnownHosts   string `yaml:"known_hosts,omitempty"` // known_hosts 路径(推荐;为空则拒绝连接)
 	RemotePath   string `yaml:"remote_path,omitempty"`
 	CertFilename string `yaml:"cert_filename,omitempty"` // 可选:覆盖 host 的远程证书文件名
 	KeyFilename  string `yaml:"key_filename,omitempty"`  // 可选:覆盖 host 的远程私钥文件名

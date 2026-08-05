@@ -129,6 +129,7 @@ certificates:
         port: 22
         user: deploy
         key: ~/.ssh/id_ed25519
+        known_hosts: ./known_hosts   # 必需!远程主机指纹,未配置则拒绝连接
         remote_path: /etc/nginx/ssl/example/
         reload_cmd: nginx -t && nginx -s reload
         # cert_filename: fullchain.pem   # 可选:远程证书文件名(默认 fullchain.pem)

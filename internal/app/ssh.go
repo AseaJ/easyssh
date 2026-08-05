@@ -9,11 +9,12 @@ import (
 
 // SSHTestParams 是 SSH 连接测试请求参数(来自配置表单当前输入,无需保存)。
 type SSHTestParams struct {
-	HostRef string `json:"host_ref,omitempty"` // 引用 hosts 定义名(优先)
-	Host    string `json:"host,omitempty"`
-	Port    int    `json:"port,omitempty"`
-	User    string `json:"user,omitempty"`
-	Key     string `json:"key,omitempty"`
+	HostRef    string `json:"host_ref,omitempty"` // 引用 hosts 定义名(优先)
+	Host       string `json:"host,omitempty"`
+	Port       int    `json:"port,omitempty"`
+	User       string `json:"user,omitempty"`
+	Key        string `json:"key,omitempty"`
+	KnownHosts string `json:"known_hosts,omitempty"`
 }
 
 // TestSSH 测试 SSH 连接:host_ref 引用 hosts 定义时以定义为基准、表单内联字段覆盖;
@@ -27,7 +28,7 @@ func (a *App) TestSSH(p SSHTestParams) (string, error) {
 	if ctx == nil {
 		ctx = context.Background()
 	}
-	host, port, user, key := p.Host, p.Port, p.User, p.Key
+	host, port, user, key, knownHosts := p.Host, p.Port, p.User, p.Key, p.KnownHosts
 	if p.HostRef != "" {
 		found := false
 		for i := range cfg.Hosts {
@@ -46,6 +47,9 @@ func (a *App) TestSSH(p SSHTestParams) (string, error) {
 				if key == "" {
 					key = h.Key
 				}
+				if knownHosts == "" {
+					knownHosts = h.KnownHosts
+				}
 				break
 			}
 		}
@@ -60,7 +64,7 @@ func (a *App) TestSSH(p SSHTestParams) (string, error) {
 		port = 22
 	}
 	if err := deploy.Ping(ctx, deploy.SSHConfig{
-		Host: host, Port: port, User: user, Key: key,
+		Host: host, Port: port, User: user, Key: key, KnownHosts: knownHosts,
 	}); err != nil {
 		return "", fmt.Errorf("连接失败: %w", err)
 	}

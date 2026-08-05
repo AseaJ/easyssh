@@ -12,12 +12,14 @@ import (
 	"net"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/agent"
+	"golang.org/x/crypto/ssh/knownhosts"
 
 	"go-zs/internal/certmgr"
 )
@@ -28,6 +30,7 @@ type SSHConfig struct {
 	Port         int
 	User         string
 	Key          string // 私钥路径(空则尝试 ssh-agent)
+	KnownHosts   string // known_hosts 路径(推荐;为空则拒绝连接,防中间人)
 	RemotePath   string // 远程目录(证书写到 <dir>/fullchain.pem、privkey.pem)
 	ReloadCmd    string // 远程执行命令(如 "nginx -t && nginx -s reload")
 	TestCmd      string // 远程校验命令(可选,reload_cmd 为空时使用)
@@ -227,10 +230,16 @@ func (s *SSH) dial(ctx context.Context) (*ssh.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+	// 严格校验远程主机指纹(known_hosts):防中间人攻击。
+	// 未配置 known_hosts 时拒绝连接,避免静默降级到不安全模式。
+	hostKeyCallback, err := s.hostKeyCallback()
+	if err != nil {
+		return nil, err
+	}
 	config := &ssh.ClientConfig{
 		User:            s.cfg.User,
 		Auth:            auths,
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(), // TODO: known_hosts 校验(v2)
+		HostKeyCallback: hostKeyCallback,
 		Timeout:         s.cfg.Timeout,
 	}
 	addr := net.JoinHostPort(s.cfg.Host, strconv.Itoa(s.cfg.Port))
@@ -244,6 +253,36 @@ func (s *SSH) dial(ctx context.Context) (*ssh.Client, error) {
 		return nil, fmt.Errorf("SSH 握手失败: %w", err)
 	}
 	return ssh.NewClient(c, chans, reqs), nil
+}
+
+// hostKeyCallback 返回基于 known_hosts 的严格主机密钥校验回调。
+// 未配置 known_hosts 路径时返回错误(拒绝连接),确保安全默认。
+func (s *SSH) hostKeyCallback() (ssh.HostKeyCallback, error) {
+	if s.cfg.KnownHosts == "" {
+		return nil, errors.New("SSH 部署未配置 known_hosts 路径(防中间人攻击必需);" +
+			"请在配置中设置 known_hosts,如: ssh-keyscan <host> >> /etc/go-zs/known_hosts")
+	}
+	khPath, err := expandHome(s.cfg.KnownHosts)
+	if err != nil {
+		return nil, fmt.Errorf("解析 known_hosts 路径: %w", err)
+	}
+	cb, err := knownhosts.New(khPath)
+	if err != nil {
+		return nil, fmt.Errorf("读取 known_hosts %s: %w", khPath, err)
+	}
+	return cb, nil
+}
+
+// expandHome 展开路径开头的 ~ 为当前用户主目录。
+func expandHome(p string) (string, error) {
+	if p == "~" || strings.HasPrefix(p, "~/") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return "", err
+		}
+		return filepath.Join(home, strings.TrimPrefix(p, "~"+string(filepath.Separator))), nil
+	}
+	return p, nil
 }
 
 func (s *SSH) authMethods() ([]ssh.AuthMethod, error) {
