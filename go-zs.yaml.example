@@ -1,0 +1,65 @@
+# go-zs 示例配置
+# 复制为 go-zs.yaml 后修改;密钥类配置用 {{env:VAR}} 引用环境变量。
+
+ca:
+  # 默认是 Let's Encrypt staging(测试环境,不占正式额度)。
+  # 跑通后切换到正式:https://acme-v02.api.letsencrypt.org/directory
+  server: https://acme-staging-v02.api.letsencrypt.org/directory
+  email: ops@example.com
+  account_key: ./data/account.key   # 首次运行自动生成
+
+certificates:
+  - name: example
+    domains:
+      - example.com
+      - www.example.com
+    challenge: http-01              # 或 dns-01(无需 80 端口,需 dns_provider)
+    # challenge: dns-01
+    # dns_provider: dnspod
+    # dns_provider_opts:
+    #   api_token: "{{env:DNSPOD_TOKEN}}"
+    storage:
+      dir: ./certs/example
+    deploy:
+      - type: nginx
+        reload_cmd: nginx -s reload
+      # - type: ssh               # 推送到远程服务器
+      #   host: 203.0.113.10
+      #   port: 22
+      #   user: deploy
+      #   key: ~/.ssh/id_ed25519
+      #   remote_path: /etc/nginx/ssl/example/
+      #   reload_cmd: nginx -t && nginx -s reload
+      #   # cert_filename: fullchain.pem   # 可选:远程证书文件名(默认 fullchain.pem)
+      #   # key_filename: privkey.pem      # 可选:远程私钥文件名(默认 privkey.pem)
+      # - type: webhook
+      #   url: https://ops.internal/cert-updated
+
+schedule:
+  check_interval: 6h                # 扫描周期
+  renew_before: 30d                 # 剩余不足 30 天触发续期
+  retry_backoff: [1h, 6h, 24h, 72h] # 失败退避序列
+
+notify:
+  # webhook: https://ops.example.com/alert   # 可选:推送 URL,收到事件 JSON
+  # smtp:                                    # 可选:邮件推送(QQ 邮箱用授权码)
+  #   host: smtp.qq.com
+  #   port: 465
+  #   user: you@qq.com
+  #   pass: "{{env:SMTP_AUTH_CODE}}"
+  #   to:                                     # 收件人,支持多个(也可写成单个字符串)
+  #     - ops@example.com
+  #     - admin@example.com
+  # events:                                   # 事件开关(失败告警始终推送,不受开关控制)
+  #   expiring: true                          # 即将到期提醒(进入续期窗口时,附到期时间)
+  #   success: true                           # 续期/部署成功提醒(附新到期时间)
+
+# SSH 目标定义(可被证书条目 deploy 的 host_ref 引用,多个条目复用同一主机)
+# hosts:
+#   - name: prod-server
+#     host: 203.0.113.10
+#     port: 22
+#     user: deploy
+#     key: ~/.ssh/id_ed25519
+#     remote_path: /etc/nginx/ssl/example/
+#     reload_cmd: nginx -t && nginx -s reload

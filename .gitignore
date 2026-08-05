@@ -1,0 +1,29 @@
+# ---- 编译产物 ----
+*.exe
+*.pid
+*.log
+go-zs-test.exe
+go-zs-new.exe
+
+# ---- 真实运行数据（绝不入库，只用 go-zs.yaml.example 做模板） ----
+go-zs.yaml
+data/
+certs/
+.env
+*.zsbundle
+
+# ---- GUI / 前端 ----
+cmd/go-zs-app/build/
+cmd/go-zs-app/frontend/node_modules/
+cmd/go-zs-app/frontend/dist/
+cmd/go-zs-app/wails.json
+
+# ---- IDE / 工具 ----
+.idea/
+.vscode/
+.reasonix/
+reasonix.toml
+*.swp
+
+# ---- 测试临时目录 ----
+.tmp-e2e/
