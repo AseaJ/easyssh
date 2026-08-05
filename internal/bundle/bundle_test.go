@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 )
 
 // --- 测试工具 ---
@@ -71,7 +71,7 @@ func newTestEnv(t *testing.T) *testEnv {
 		}},
 		Schedule: config.DefaultSchedule(),
 	}
-	configPath := filepath.Join(dir, "go-zs.yaml")
+	configPath := filepath.Join(dir, "easyssh.yaml")
 	data, err := yamlMarshal(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -260,7 +260,7 @@ func TestApplyImportToEmptyTarget(t *testing.T) {
 	}
 	// 全新目标目录
 	target := t.TempDir()
-	targetCfg := filepath.Join(target, "go-zs.yaml")
+	targetCfg := filepath.Join(target, "easyssh.yaml")
 	persisted := map[string]string{}
 	res, err := ApplyImport(b, MergeOptions{
 		ConfigPath: targetCfg,
@@ -308,7 +308,7 @@ func TestApplyImportConflictAppend(t *testing.T) {
 	b, _ := ReadBundle(bundlePath, pw)
 
 	target := t.TempDir()
-	targetCfg := filepath.Join(target, "go-zs.yaml")
+	targetCfg := filepath.Join(target, "easyssh.yaml")
 	// 目标已有一个同名条目与同名 host
 	tcfg := &config.Config{
 		CA:           config.CAConfig{Server: "https://acme.example.com/directory", Email: "ops@example.com", AccountKey: "./data/account.key"},
@@ -368,7 +368,7 @@ func TestApplyImportConflictSkip(t *testing.T) {
 	b, _ := ReadBundle(bundlePath, pw)
 
 	target := t.TempDir()
-	targetCfg := filepath.Join(target, "go-zs.yaml")
+	targetCfg := filepath.Join(target, "easyssh.yaml")
 	tcfg := &config.Config{
 		CA:           config.CAConfig{Server: "https://acme.example.com/directory", Email: "ops@example.com", AccountKey: "./data/account.key"},
 		Hosts:        []config.HostConfig{{Name: "prod", Host: "10.0.0.1", Port: 22, User: "u"}},

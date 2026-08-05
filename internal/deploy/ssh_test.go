@@ -26,9 +26,9 @@ import (
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/knownhosts"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/config"
-	"go-zs/internal/testutil"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/config"
+	"github.com/asea/easyssh/internal/testutil"
 )
 
 // sshTestServer 是内存 SSH 服务器,支持 sftp subsystem 与 exec 命令。

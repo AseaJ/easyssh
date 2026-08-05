@@ -8,14 +8,14 @@ import (
 )
 
 func TestBuildRestartScript(t *testing.T) {
-	oldExe := `C:\go-zs\build\bin\go-zs.exe`
-	newExe := `C:\go-zs\build\bin\go-zs-new.exe`
+	oldExe := `C:\easyssh\build\bin\easyssh.exe`
+	newExe := `C:\easyssh\build\bin\easyssh-new.exe`
 	s := buildRestartScript(oldExe, newExe)
 	for _, want := range []string{
-		`tasklist /FI "IMAGENAME eq go-zs.exe"`,
-		`del /f /q "C:\go-zs\build\bin\go-zs.exe"`,
-		`move /y "C:\go-zs\build\bin\go-zs-new.exe" "C:\go-zs\build\bin\go-zs.exe"`,
-		`start "" "C:\go-zs\build\bin\go-zs.exe"`,
+		`tasklist /FI "IMAGENAME eq easyssh.exe"`,
+		`del /f /q "C:\easyssh\build\bin\easyssh.exe"`,
+		`move /y "C:\easyssh\build\bin\easyssh-new.exe" "C:\easyssh\build\bin\easyssh.exe"`,
+		`start "" "C:\easyssh\build\bin\easyssh.exe"`,
 		`del /f /q "%~f0"`,
 	} {
 		if !strings.Contains(s, want) {
@@ -25,17 +25,17 @@ func TestBuildRestartScript(t *testing.T) {
 }
 
 func TestFindProjectRoot(t *testing.T) {
-	// 模拟真实布局:exe 在 <root>/cmd/go-zs-app/build/bin
+	// 模拟真实布局:exe 在 <root>/cmd/easyssh-app/build/bin
 	dir := t.TempDir()
 	root := filepath.Join(dir, "root")
-	bin := filepath.Join(root, "cmd", "go-zs-app", "build", "bin")
+	bin := filepath.Join(root, "cmd", "easyssh-app", "build", "bin")
 	if err := os.MkdirAll(bin, 0o755); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.WriteFile(filepath.Join(root, "go.mod"), []byte("module test\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(root, "cmd", "go-zs-app", "wails.json"), []byte("{}"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "cmd", "easyssh-app", "wails.json"), []byte("{}"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 
@@ -57,7 +57,7 @@ func TestTailString(t *testing.T) {
 
 func TestEnsureNewExe(t *testing.T) {
 	dir := t.TempDir()
-	built := filepath.Join(dir, "built", "go-zs-new.exe")
+	built := filepath.Join(dir, "built", "easyssh-new.exe")
 	if err := os.MkdirAll(filepath.Dir(built), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -71,7 +71,7 @@ func TestEnsureNewExe(t *testing.T) {
 	}
 
 	// 不同路径:复制到 exe 目录
-	target := filepath.Join(dir, "bin", "go-zs-new.exe")
+	target := filepath.Join(dir, "bin", "easyssh-new.exe")
 	if err := ensureNewExe(built, target); err != nil {
 		t.Fatal(err)
 	}

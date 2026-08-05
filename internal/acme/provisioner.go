@@ -16,8 +16,8 @@ import (
 	"github.com/go-acme/lego/v4/lego"
 	"github.com/go-acme/lego/v4/registration"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/storage"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/storage"
 )
 
 // Options 是 ACME Provisioner 的构造参数(来自配置)。

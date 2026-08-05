@@ -23,7 +23,7 @@ func AcquirePIDFile(path string) (release func(), err error) {
 		pidStr := strings.TrimSpace(string(data))
 		if pid, perr := strconv.Atoi(pidStr); perr == nil && pid > 0 {
 			if processAlive(pid) {
-				return nil, fmt.Errorf("%w: 已有 go-zs 实例运行(PID %d,%s)", ErrLocked, pid, path)
+				return nil, fmt.Errorf("%w: 已有 easyssh 实例运行(PID %d,%s)", ErrLocked, pid, path)
 			}
 			// PID 已死:残留文件,覆盖继续
 		}

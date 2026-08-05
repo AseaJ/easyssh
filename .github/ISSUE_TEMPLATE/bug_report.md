@@ -25,12 +25,12 @@ assignees: ''
 
 ## 实际行为
 
-实际发生了什么?(附 `go-zs list` / `go-zs inspect <name>` 输出,如适用)
+实际发生了什么?(附 `easyssh list` / `easyssh inspect <name>` 输出,如适用)
 
 ## 环境
 
 - 操作系统:Windows / Linux / macOS,版本
-- go-zs 版本:`go-zs --version` 输出
+- easyssh 版本:`easyssh --version` 输出
 - 部署类型:nginx / ssh / file / webhook
 - ACME 环境:staging / production
 

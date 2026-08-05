@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 	"gopkg.in/yaml.v3"
 )
 

@@ -9,7 +9,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 )
 
 func TestDurationMarshalYAML(t *testing.T) {
@@ -63,7 +63,7 @@ func TestSaveConfigRoundTrip(t *testing.T) {
 		t.Errorf("返回消息异常: %s", msg)
 	}
 	// 文件已更新
-	raw, _ := os.ReadFile(filepath.Join(dir, "go-zs.yaml"))
+	raw, _ := os.ReadFile(filepath.Join(dir, "easyssh.yaml"))
 	if !strings.Contains(string(raw), "www.noslop.top") {
 		t.Error("配置文件中未出现新域名")
 	}
@@ -109,7 +109,7 @@ func TestSaveConfigSecretToEnv(t *testing.T) {
 		t.Errorf("持久化值异常: %v", persisted)
 	}
 	// 配置文件里应只存引用,无明文
-	raw, _ := os.ReadFile(filepath.Join(dir, "go-zs.yaml"))
+	raw, _ := os.ReadFile(filepath.Join(dir, "easyssh.yaml"))
 	if strings.Contains(string(raw), "secrettoken") {
 		t.Error("配置文件不应出现明文密钥")
 	}
@@ -179,7 +179,7 @@ func TestSaveConfigHostsAndSMTP(t *testing.T) {
 		t.Errorf("应提示 SMTP 环境变量: %s", msg)
 	}
 	// 配置文件含 hosts 与 smtp 引用,不含明文授权码
-	raw, _ := os.ReadFile(filepath.Join(dir, "go-zs.yaml"))
+	raw, _ := os.ReadFile(filepath.Join(dir, "easyssh.yaml"))
 	if !strings.Contains(string(raw), "prod") || !strings.Contains(string(raw), "smtp.qq.com") {
 		t.Error("配置文件中缺少 hosts/smtp 配置")
 	}
@@ -239,7 +239,7 @@ func TestSaveConfigDNSNonSecretOptsStayPlain(t *testing.T) {
 	if len(persisted) != 1 || persisted[0] != "GOZS_EXAMPLE_DNSPOD_API_KEY" {
 		t.Errorf("persistEnv 调用异常: %v", persisted)
 	}
-	raw, _ := os.ReadFile(filepath.Join(dir, "go-zs.yaml"))
+	raw, _ := os.ReadFile(filepath.Join(dir, "easyssh.yaml"))
 	s := string(raw)
 	if strings.Contains(s, "secrettoken") {
 		t.Error("配置文件不应出现明文密钥")
@@ -264,7 +264,7 @@ func TestSaveConfigDNSNonSecretOptsStayPlain(t *testing.T) {
 func TestGetConfigExpandsNonSecretEnvRef(t *testing.T) {
 	dir := writeTestConfig(t)
 	// 手工构造:非敏感参数被存成 env 引用(模拟旧版本保存)
-	rawPath := filepath.Join(dir, "go-zs.yaml")
+	rawPath := filepath.Join(dir, "easyssh.yaml")
 	raw, _ := os.ReadFile(rawPath)
 	patched := strings.Replace(string(raw),
 		"    challenge: http-01",

@@ -14,11 +14,11 @@ certs/
 *.zsbundle
 
 # ---- GUI / 前端 ----
-cmd/go-zs-app/build/
-cmd/go-zs-app/frontend/node_modules/
-cmd/go-zs-app/frontend/dist/
-cmd/go-zs-app/wails.json
-cmd/go-zs-app/frontend/package.json.md5
+cmd/easyssh-app/build/
+cmd/easyssh-app/frontend/node_modules/
+cmd/easyssh-app/frontend/dist/
+cmd/easyssh-app/wails.json
+cmd/easyssh-app/frontend/package.json.md5
 
 # ---- IDE / 工具 ----
 .idea/

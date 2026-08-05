@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 	"gopkg.in/yaml.v3"
 )
 
@@ -37,7 +37,7 @@ const (
 var envRefRe = regexp.MustCompile(`\{\{env:([A-Za-z_][A-Za-z0-9_]*)\}\}`)
 
 // BundleKind 标识包类型。
-const BundleKind = "go-zs-bundle"
+const BundleKind = "easyssh-bundle"
 
 // zip 读取防护上限(防 zip bomb):包总大小 256MB、单条 64MB、条目数 4096。
 const (

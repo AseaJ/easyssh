@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // NginxConfig 是 nginx 部署目标配置。

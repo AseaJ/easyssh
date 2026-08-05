@@ -11,12 +11,12 @@ import (
 
 	"golang.org/x/time/rate"
 
-	"go-zs/internal/acme"
-	"go-zs/internal/certmgr"
-	"go-zs/internal/config"
-	"go-zs/internal/deploy"
-	"go-zs/internal/notify"
-	"go-zs/internal/storage"
+	"github.com/asea/easyssh/internal/acme"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/config"
+	"github.com/asea/easyssh/internal/deploy"
+	"github.com/asea/easyssh/internal/notify"
+	"github.com/asea/easyssh/internal/storage"
 )
 
 // Report 是一次扫描中单个条目的执行结果。

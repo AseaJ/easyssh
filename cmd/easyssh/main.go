@@ -1,4 +1,4 @@
-// Command go-zs 是证书自动化托管工具的 CLI 入口(headless 模式)。
+// Command easyssh 是证书自动化托管工具的 CLI 入口(headless 模式)。
 package main
 
 import (
@@ -15,11 +15,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"go-zs/internal/acme"
-	"go-zs/internal/app"
-	"go-zs/internal/config"
-	"go-zs/internal/scheduler"
-	"go-zs/internal/storage"
+	"github.com/asea/easyssh/internal/acme"
+	"github.com/asea/easyssh/internal/app"
+	"github.com/asea/easyssh/internal/config"
+	"github.com/asea/easyssh/internal/scheduler"
+	"github.com/asea/easyssh/internal/storage"
 )
 
 // version 是 CLI 版本号,构建时可通过 -ldflags "-X main.version=vX.Y.Z" 注入。
@@ -36,11 +36,11 @@ func main() {
 
 func newRootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:     "go-zs",
+		Use:     "easyssh",
 		Short:   "证书自动化托管工具",
 		Version: version,
 	}
-	root.PersistentFlags().StringP("config", "c", "go-zs.yaml", "配置文件路径")
+	root.PersistentFlags().StringP("config", "c", "easyssh.yaml", "配置文件路径")
 	root.AddCommand(newValidateConfigCmd())
 	root.AddCommand(newListCmd())
 	root.AddCommand(newInspectCmd())
@@ -285,7 +285,7 @@ func newServeCmd() *cobra.Command {
 			ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 			defer stop()
 
-			logger.Printf("go-zs serve 启动,调度配置: %s", sched.Describe())
+			logger.Printf("easyssh serve 启动,调度配置: %s", sched.Describe())
 			interval := cfg.Schedule.CheckInterval.Std()
 			for {
 				reports := sched.RunOnce(ctx)
@@ -305,7 +305,7 @@ func newServeCmd() *cobra.Command {
 			}
 		},
 	}
-	cmd.Flags().StringVar(&pidFile, "pidfile", "go-zs.pid", "PID 文件路径(单实例锁);为空则禁用")
+	cmd.Flags().StringVar(&pidFile, "pidfile", "easyssh.pid", "PID 文件路径(单实例锁);为空则禁用")
 	return cmd
 }
 

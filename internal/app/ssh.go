@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"go-zs/internal/deploy"
+	"github.com/asea/easyssh/internal/deploy"
 )
 
 // SSHTestParams 是 SSH 连接测试请求参数(来自配置表单当前输入,无需保存)。

@@ -4,7 +4,7 @@ package storage
 import (
 	"context"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // Store 是证书/私钥/元数据的存储抽象。

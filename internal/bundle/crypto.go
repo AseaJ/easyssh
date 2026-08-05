@@ -83,7 +83,7 @@ func decryptBlob(password string, blob []byte, kdf KDF) ([]byte, error) {
 		return nil, ErrBadPassword // 太短不可能是合法密文
 	}
 	if string(blob[:len(cryptMagic)]) != cryptMagic {
-		return nil, ErrFormat("加密数据头不匹配(可能不是 go-zs 导出包)")
+		return nil, ErrFormat("加密数据头不匹配(可能不是 easyssh 导出包)")
 	}
 	if blob[len(cryptMagic)] != cryptVersion {
 		return nil, ErrFormat("不支持的加密版本 %d", blob[len(cryptMagic)])

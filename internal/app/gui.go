@@ -11,19 +11,19 @@ import (
 	"sync"
 	"time"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/config"
-	"go-zs/internal/logring"
-	"go-zs/internal/notify"
-	"go-zs/internal/scheduler"
-	"go-zs/internal/storage"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/config"
+	"github.com/asea/easyssh/internal/logring"
+	"github.com/asea/easyssh/internal/notify"
+	"github.com/asea/easyssh/internal/scheduler"
+	"github.com/asea/easyssh/internal/storage"
 )
 
 // App 是 Wails 前端可调用的应用对象。
 // 前端通过 window.go.app.App.<Method> 访问导出方法。
 type App struct {
 	ctx        context.Context
-	configDir  string     // 配置文件目录(配置文件名固定 go-zs.yaml)
+	configDir  string     // 配置文件目录(配置文件名固定 easyssh.yaml)
 	mu         sync.Mutex // 保护 cfg/rawCfg/sched/lastRun/lastScan/lastError/missingEnv(reload、自动扫描、Wails 方法并发访问)
 	cfg        *config.Config
 	rawCfg     *config.Config // 未展开 env 的原始配置(GetConfig 用它显示密钥引用,不暴露明文)
@@ -152,9 +152,9 @@ func (a *App) reload() error {
 
 func (a *App) cfgPath() string {
 	if a.configDir == "" {
-		return "go-zs.yaml"
+		return "easyssh.yaml"
 	}
-	return filepath.Join(a.configDir, "go-zs.yaml")
+	return filepath.Join(a.configDir, "easyssh.yaml")
 }
 
 // GetLogs 返回最近的日志(供 GUI 日志面板)。

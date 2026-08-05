@@ -63,7 +63,7 @@ func parseFloat(s string) (float64, error) {
 	return f, err
 }
 
-// Config 是 go-zs 的完整配置。
+// Config 是 easyssh 的完整配置。
 type Config struct {
 	CA           CAConfig            `yaml:"ca"`
 	Hosts        []HostConfig        `yaml:"hosts,omitempty"` // SSH 目标定义(可被 deploy 按 host_ref 引用)

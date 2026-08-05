@@ -8,13 +8,13 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
 
-	"go-zs/internal/app"
-	"go-zs/internal/bundle"
+	"github.com/asea/easyssh/internal/app"
+	"github.com/asea/easyssh/internal/bundle"
 )
 
 // newExportCmd 导出证书配置/密钥/产物为 .zsbundle 包。
 //
-//	go-zs export -c go-zs.yaml -o out.zsbundle --scope config,secrets,certs,ssh-keys
+//	easyssh export -c easyssh.yaml -o out.zsbundle --scope config,secrets,certs,ssh-keys
 //
 // scope 含 secrets 或 ssh-keys 时必须提供口令(--password 或交互输入)。
 func newExportCmd() *cobra.Command {
@@ -75,7 +75,7 @@ func newExportCmd() *cobra.Command {
 			return nil
 		},
 	}
-	cmd.Flags().StringVarP(&out, "output", "o", "", "导出包路径(默认 <config 同目录>/go-zs-<时间戳>.zsbundle)")
+	cmd.Flags().StringVarP(&out, "output", "o", "", "导出包路径(默认 <config 同目录>/easyssh-<时间戳>.zsbundle)")
 	cmd.Flags().StringVar(&scope, "scope", "config", "导出范围(逗号分隔):config,secrets,certs,ssh-keys")
 	cmd.Flags().StringVar(&passwd, "password", "", "导出口令(含 secrets/ssh-keys 时必填;也可交互输入)")
 	cmd.Flags().BoolVar(&useTerm, "stdin-password", false, "强制交互输入口令")
@@ -84,7 +84,7 @@ func newExportCmd() *cobra.Command {
 
 // newImportCmd 导入 .zsbundle 包到当前配置。
 //
-//	go-zs import -c go-zs.yaml -f out.zsbundle --conflict append
+//	easyssh import -c easyssh.yaml -f out.zsbundle --conflict append
 func newImportCmd() *cobra.Command {
 	var (
 		file     string

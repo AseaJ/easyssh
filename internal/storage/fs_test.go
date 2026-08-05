@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // genSelfSigned 生成一张自签测试证书(PEM)。

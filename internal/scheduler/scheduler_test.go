@@ -1,4 +1,4 @@
-﻿package scheduler
+package scheduler
 
 import (
 	"context"
@@ -11,13 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"go-zs/internal/acme"
-	"go-zs/internal/certmgr"
-	"go-zs/internal/config"
-	"go-zs/internal/deploy"
-	"go-zs/internal/notify"
-	"go-zs/internal/storage"
-	"go-zs/internal/testutil"
+	"github.com/asea/easyssh/internal/acme"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/config"
+	"github.com/asea/easyssh/internal/deploy"
+	"github.com/asea/easyssh/internal/notify"
+	"github.com/asea/easyssh/internal/storage"
+	"github.com/asea/easyssh/internal/testutil"
 )
 
 // mockProv 是测试用签发源,实现 acme.Provisioner。

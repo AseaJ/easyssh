@@ -1,4 +1,4 @@
-// Command go-zs-app 是 go-zs 的桌面应用入口(Wails)。
+// Command easyssh-app 是 easyssh 的桌面应用入口(Wails)。
 package main
 
 import (
@@ -12,7 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
 
-	"go-zs/internal/app"
+	"github.com/asea/easyssh/internal/app"
 
 	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
@@ -31,7 +31,7 @@ func main() {
 	legoLog.Logger = log.New(a.LogWriter(), "", log.LstdFlags)
 
 	err = wails.Run(&options.App{
-		Title:     "go-zs 证书托管",
+		Title:     "easyssh 证书托管",
 		Width:     1160,
 		Height:    780,
 		MinWidth:  920,
@@ -59,9 +59,9 @@ func main() {
 
 // resolveConfigDir 按优先级确定配置文件目录:
 //  1. 环境变量 GOZS_CONFIG_DIR(显式指定)
-//  2. exe 所在目录(存在 go-zs.yaml)
-//  3. 从 exe 目录向上找项目根(含 go.mod 且存在 go-zs.yaml)——桌面端从 build/bin 启动时的常规场景
-//  4. 当前工作目录(存在 go-zs.yaml)
+//  2. exe 所在目录(存在 easyssh.yaml)
+//  3. 从 exe 目录向上找项目根(含 go.mod 且存在 easyssh.yaml)——桌面端从 build/bin 启动时的常规场景
+//  4. 当前工作目录(存在 easyssh.yaml)
 //  5. 当前工作目录(兜底,启动后由 App 报错提示)
 func resolveConfigDir() (string, error) {
 	if v := os.Getenv("GOZS_CONFIG_DIR"); v != "" {
@@ -85,25 +85,25 @@ func resolveConfigDir() (string, error) {
 // findConfigDirFrom 核心解析逻辑(便于测试):exeDir 为 exe 所在目录,cwd 为工作目录。
 func findConfigDirFrom(exeDir, cwd string) string {
 	if exeDir != "" {
-		if _, err := os.Stat(filepath.Join(exeDir, "go-zs.yaml")); err == nil {
+		if _, err := os.Stat(filepath.Join(exeDir, "easyssh.yaml")); err == nil {
 			return exeDir
 		}
 		if root := findProjectRootConfig(exeDir); root != "" {
 			return root
 		}
 	}
-	if _, err := os.Stat(filepath.Join(cwd, "go-zs.yaml")); err == nil {
+	if _, err := os.Stat(filepath.Join(cwd, "easyssh.yaml")); err == nil {
 		return cwd
 	}
 	return cwd
 }
 
-// findProjectRootConfig 从 dir 向上(最多 8 层)找第一个含 go.mod 且存在 go-zs.yaml 的目录。
+// findProjectRootConfig 从 dir 向上(最多 8 层)找第一个含 go.mod 且存在 easyssh.yaml 的目录。
 func findProjectRootConfig(dir string) string {
 	d := dir
 	for i := 0; i < 8; i++ {
 		if _, err := os.Stat(filepath.Join(d, "go.mod")); err == nil {
-			if _, err := os.Stat(filepath.Join(d, "go-zs.yaml")); err == nil {
+			if _, err := os.Stat(filepath.Join(d, "easyssh.yaml")); err == nil {
 				return d
 			}
 		}

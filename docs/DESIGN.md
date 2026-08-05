@@ -1,4 +1,4 @@
-# go-zs 设计文档
+# easyssh 设计文档
 
 > 证书自动化托管工具(桌面端 + CLI)
 > 状态:方案设计定稿(实现完成度见文末"实现状态")
@@ -21,7 +21,7 @@
 
 ## 1. 项目定位
 
-go-zs 是一个证书自动化托管工具,用于:
+easyssh 是一个证书自动化托管工具,用于:
 
 - 自动签发证书(ACME 协议,基于 lego)
 - 自动续期(剩余 < 30 天触发)
@@ -59,10 +59,10 @@ go-zs 是一个证书自动化托管工具,用于:
 ## 4. 模块划分
 
 ```
-go-zs/
+easyssh/
 ├── cmd/
-│   ├── go-zs/          # CLI (headless): serve / list / renew / inspect / validate-config
-│   └── go-zs-app/      # 桌面应用入口 (Wails)
+│   ├── easyssh/          # CLI (headless): serve / list / renew / inspect / validate-config
+│   └── easyssh-app/      # 桌面应用入口 (Wails)
 ├── internal/
 │   ├── config/         # YAML 分层配置 + 校验 + 热加载
 │   ├── certmgr/        # 生命周期状态机 (幂等/指纹/SAN 变更检测)
@@ -74,7 +74,7 @@ go-zs/
 │   └── app/            # Wails bindings (GUI ↔ core 桥接)
 ├── frontend/           # Wails 前端 (仪表盘)
 ├── docs/DESIGN.md
-└── go-zs.yaml.example
+└── easyssh.yaml.example
 ```
 
 ## 5. 证书来源(Provisioner)
@@ -187,14 +187,14 @@ POST 事件通知(新证书指纹/路径),由网关自行热加载。
 
 ## 10. 监控与状态查询
 
-- `go-zs list`:列出全部托管证书与剩余天数
-- `go-zs inspect <name>`:查看单张详情(SAN/NotBefore/NotAfter/指纹/部署状态)
+- `easyssh list`:列出全部托管证书与剩余天数
+- `easyssh inspect <name>`:查看单张详情(SAN/NotBefore/NotAfter/指纹/部署状态)
 - GUI 仪表盘:概览卡片 + 证书列表(绿/黄/红三色剩余天数)+ 条目详情 + 立即续期/部署按钮
 
 ## 11. 配置模型
 
 ```yaml
-# go-zs.yaml
+# easyssh.yaml
 ca:
   server: https://acme-v02.api.letsencrypt.org/directory  # 默认 staging 先跑通
   email: ops@example.com

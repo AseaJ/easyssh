@@ -15,6 +15,10 @@
 
 - CLI 版本号改为构建期注入(`-ldflags "-X main.version=vX.Y.Z"`)
 - 移除无用代码
+- 项目更名为 **easyssh**,CLI 命令改为 `easyssh`,所有代码/文档同步更新
+  - 配置文件名: `easyssh.yaml`(原 `go-zs.yaml`)
+  - 可执行文件名: `easyssh.exe`(原 `go-zs.exe`)
+  - module path: `github.com/asea/easyssh`(仓库创建后启用)
 
 ## [0.1.0-dev] - 2026-08-05
 

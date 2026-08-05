@@ -16,7 +16,7 @@
 - [ ] `go build ./...` 通过
 - [ ] `go vet ./...` 无告警
 - [ ] `go test ./...` 全绿
-- [ ] 涉及配置结构时,已更新 `go-zs.yaml.example` 与 README
+- [ ] 涉及配置结构时,已更新 `easyssh.yaml.example` 与 README
 
 ## 安全
 

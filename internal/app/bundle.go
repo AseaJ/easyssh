@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"go-zs/internal/bundle"
+	"github.com/asea/easyssh/internal/bundle"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -54,7 +54,7 @@ func (a *App) ExportBundle(req ExportRequest) (*ExportResult, error) {
 	if req.Scope.NeedsPassword() && req.Password == "" {
 		return nil, fmt.Errorf("含密钥/私钥的导出需要设置口令")
 	}
-	// 默认导出路径:配置目录下 go-zs-<name>.zsbundle
+	// 默认导出路径:配置目录下 easyssh-<name>.zsbundle
 	m, err := bundle.Export(req.OutPath, bundle.ExportOptions{
 		ConfigPath: a.cfgPath(),
 		Scope:      req.Scope,

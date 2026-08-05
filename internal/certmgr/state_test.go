@@ -1,10 +1,10 @@
-﻿package certmgr
+package certmgr
 
 import (
 	"testing"
 	"time"
 
-	"go-zs/internal/testutil"
+	"github.com/asea/easyssh/internal/testutil"
 )
 
 const renewBefore = 30 * 24 * time.Hour

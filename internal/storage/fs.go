@@ -12,7 +12,7 @@ import (
 	"sort"
 	"time"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // 磁盘布局(storage.dir 即条目产物目录):

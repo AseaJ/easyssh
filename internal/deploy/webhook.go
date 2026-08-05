@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"time"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // Webhook 把证书更新事件 POST 到指定 URL,由网关自行热加载。

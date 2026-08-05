@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // FileConfig 是 file 部署目标配置:把证书复制到指定目录。

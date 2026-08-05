@@ -47,7 +47,7 @@ type SSHKeyRef struct {
 // Manifest 是导出包根部的明文清单。内容先于 manifest 写入 zip,保证清单完整可信。
 type Manifest struct {
 	FormatVersion int         `json:"format_version"`
-	Kind          string      `json:"kind"` // "go-zs-bundle"
+	Kind          string      `json:"kind"` // "easyssh-bundle"
 	ExportedAt    string      `json:"exported_at"`
 	AppVersion    string      `json:"app_version,omitempty"`
 	Scope         Scope       `json:"scope"`
@@ -67,7 +67,7 @@ func (m *Manifest) validate() error {
 		return ErrFormat("不支持的格式版本 %d(当前支持 %d)", m.FormatVersion, FormatVersion)
 	}
 	if m.Kind != BundleKind {
-		return ErrFormat("不是 go-zs 导出包(kind=%q)", m.Kind)
+		return ErrFormat("不是 easyssh 导出包(kind=%q)", m.Kind)
 	}
 	if m.Scope.Secrets || m.Scope.SSHKeys {
 		if m.KDF.Algo != "scrypt" || m.KDF.N <= 0 || m.KDF.R <= 0 || m.KDF.P <= 0 || m.KDF.KeyLen <= 0 {

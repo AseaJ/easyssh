@@ -7,8 +7,8 @@ import (
 	"testing"
 	"time"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/testutil"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/testutil"
 )
 
 // mockRunner 记录调用并可按命令模拟失败。

@@ -1,11 +1,11 @@
 # 贡献指南
 
-感谢你愿意为 go-zs 贡献代码!请花几分钟读完这份指南,能让你的 PR 更快被合并。
+感谢你愿意为 easyssh 贡献代码!请花几分钟读完这份指南,能让你的 PR 更快被合并。
 
 ## 项目速览
 
 - **语言**:Go 1.25+,CLI 用 [cobra](https://github.com/spf13/cobra),GUI 用 [Wails v2](https://wails.io)
-- **结构**:核心逻辑在 `internal/`(config / certmgr / scheduler / acme / storage / deploy / notify),CLI 入口在 `cmd/go-zs`,GUI 在 `cmd/go-zs-app`
+- **结构**:核心逻辑在 `internal/`(config / certmgr / scheduler / acme / storage / deploy / notify),CLI 入口在 `cmd/easyssh`,GUI 在 `cmd/easyssh-app`
 - **架构说明**:见 [`docs/DESIGN.md`](docs/DESIGN.md)
 
 ## 环境要求
@@ -17,7 +17,7 @@
 
 ```bash
 # 构建 CLI
-go build ./cmd/go-zs
+go build ./cmd/easyssh
 
 # 运行测试
 go test ./...
@@ -32,7 +32,7 @@ go vet ./...
 2. `go vet ./...` 无告警
 3. `go test ./...` 全绿
 4. 新功能/修复带有对应测试(尤其是安全相关改动)
-5. 若改动配置结构,同步更新 `go-zs.yaml.example` 与 README
+5. 若改动配置结构,同步更新 `easyssh.yaml.example` 与 README
 6. `git commit` 信息遵循 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/):
    `feat:` / `fix:` / `docs:` / `chore:` / `refactor:` / `test:` 前缀
 

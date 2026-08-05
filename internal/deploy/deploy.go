@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/config"
 )
 
 // Deployer 是部署目标抽象。

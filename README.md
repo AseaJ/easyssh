@@ -1,13 +1,13 @@
-# go-zs — 证书自动化托管工具
+# easyssh — 证书自动化托管工具
 
 [![Go Version](https://img.shields.io/badge/Go-1.25-blue)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 <!-- 仓库创建后取消注释并替换路径:
-[![CI](https://github.com/<用户名>/go-zs/actions/workflows/ci.yml/badge.svg)](https://github.com/<用户名>/go-zs/actions/workflows/ci.yml)
-[![Release](https://img.shields.io/github/v/release/<用户名>/go-zs)](https://github.com/<用户名>/go-zs/releases)
+[![CI](https://github.com/asea/easyssh/actions/workflows/ci.yml/badge.svg)](https://github.com/asea/easyssh/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/asea/easyssh)](https://github.com/asea/easyssh/releases)
 -->
 
-go-zs 是一个证书自动化托管工具:自动签发(ACME)、自动续期、自动部署到反向代理(本地/SSH 远程),并提供简洁的桌面仪表盘(GUI)与 headless CLI 双形态。
+easyssh 是一个证书自动化托管工具:自动签发(ACME)、自动续期、自动部署到反向代理(本地/SSH 远程),并提供简洁的桌面仪表盘(GUI)与 headless CLI 双形态。
 
 > ⚠️ 当前为开发版本(0.1.0-dev)。默认连接 Let's Encrypt **staging** 环境,请先跑通后再切换到正式环境。
 
@@ -18,7 +18,7 @@ go-zs 是一个证书自动化托管工具:自动签发(ACME)、自动续期、�
 | CLI(headless) | ✅ | ✅(交叉编译) | ✅(交叉编译) |
 | GUI(Wails) | ✅ | ⚠️ 需 webkit2gtk,密钥持久化暂缺 | ⚠️ 需 webkit2gtk |
 
-- Linux/macOS 的 CLI 可在 Windows 上交叉编译(`GOOS=linux GOARCH=amd64 go build ./cmd/go-zs`)
+- Linux/macOS 的 CLI 可在 Windows 上交叉编译(`GOOS=linux GOARCH=amd64 go build ./cmd/easyssh`)
 - Linux/macOS GUI 桌面端:密钥持久化(Windows 注册表)在非 Windows 平台暂未实现,密钥需通过环境变量注入
 
 ## 功能特性
@@ -59,36 +59,36 @@ go-zs 是一个证书自动化托管工具:自动签发(ACME)、自动续期、�
 
 ```bash
 # CLI
-go build -o go-zs.exe ./cmd/go-zs
+go build -o easyssh.exe ./cmd/easyssh
 
 # GUI(桌面应用)
-cd cmd/go-zs-app
-wails build   # 产出 build/bin/go-zs(.exe)
+cd cmd/easyssh-app
+wails build   # 产出 build/bin/easyssh(.exe)
 ```
 
 ## 快速开始
 
 ```bash
 # 1. 准备配置
-cp go-zs.yaml.example go-zs.yaml
-#    编辑 go-zs.yaml:CA、邮箱、域名、挑战方式、部署目标
+cp easyssh.yaml.example easyssh.yaml
+#    编辑 easyssh.yaml:CA、邮箱、域名、挑战方式、部署目标
 
 # 2. 校验配置(注意:默认 staging 环境)
-go-zs validate-config -c go-zs.yaml
+easyssh validate-config -c easyssh.yaml
 
 # 3. 手动签发一次(建议先对 staging 验证流程)
-go-zs issue <name> -c go-zs.yaml
+easyssh issue <name> -c easyssh.yaml
 
 # 4. 查看状态
-go-zs list -c go-zs.yaml
-go-zs inspect <name> -c go-zs.yaml
+easyssh list -c easyssh.yaml
+easyssh inspect <name> -c easyssh.yaml
 
 # 5. 守护进程模式(常驻:扫描/续期/部署)
-go-zs serve -c go-zs.yaml --pidfile go-zs.pid
+easyssh serve -c easyssh.yaml --pidfile easyssh.pid
 
 # 6. 手动强制续期 / 启动桌面应用
-go-zs renew <name> -c go-zs.yaml
-go-zs-app          # GUI
+easyssh renew <name> -c easyssh.yaml
+easyssh-app          # GUI
 ```
 
 ## 导出 / 导入(多客户端共用配置)
@@ -104,13 +104,13 @@ go-zs-app          # GUI
 
 ```bash
 # 导出:仅配置(可安全分发)
-go-zs export -c go-zs.yaml -o cfg.zsbundle --scope config
+easyssh export -c easyssh.yaml -o cfg.zsbundle --scope config
 
 # 导出:配置 + 加密密钥(口令至少 10 字符,非纯数字)
-go-zs export -c go-zs.yaml -o full.zsbundle --scope config,secrets,certs,ssh-keys --password 'StrongPass!42'
+easyssh export -c easyssh.yaml -o full.zsbundle --scope config,secrets,certs,ssh-keys --password 'StrongPass!42'
 
 # 导入(先预览,再确认;冲突策略 append=改名追加 / skip=跳过 / overwrite=覆盖)
-go-zs import -f full.zsbundle -c go-zs.yaml --conflict append --password 'StrongPass!42'
+easyssh import -f full.zsbundle -c easyssh.yaml --conflict append --password 'StrongPass!42'
 ```
 
 注意:

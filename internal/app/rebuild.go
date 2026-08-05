@@ -10,9 +10,9 @@ import (
 )
 
 // RebuildAndRestart 重新构建 GUI 并自动重启:
-//  1. 在 wails 项目目录(cmd/go-zs-app,含 wails.json)执行 `wails build -o go-zs-new.exe`,
-//     产物为 cmd/go-zs-app/build/bin/go-zs-new.exe,若与当前 exe 不同目录则复制过去
-//  2. 在 exe 目录写入 restart-go-zs.bat:等当前进程退出后,用新 exe 替换旧 exe 并重新启动
+//  1. 在 wails 项目目录(cmd/easyssh-app,含 wails.json)执行 `wails build -o easyssh-new.exe`,
+//     产物为 cmd/easyssh-app/build/bin/easyssh-new.exe,若与当前 exe 不同目录则复制过去
+//  2. 在 exe 目录写入 restart-easyssh.bat:等当前进程退出后,用新 exe 替换旧 exe 并重新启动
 //  3. 前端收到成功后调用 runtime.Quit() 退出,脚本自动接管重启
 //
 // 仅支持 Windows(桌面应用当前仅发布 Windows)。构建失败时不写脚本、不退出。
@@ -25,17 +25,17 @@ func (a *App) RebuildAndRestart() (string, error) {
 		return "", fmt.Errorf("定位当前程序: %w", err)
 	}
 	exeDir := filepath.Dir(exe)
-	newExe := filepath.Join(exeDir, "go-zs-new.exe")
+	newExe := filepath.Join(exeDir, "easyssh-new.exe")
 
-	// 1) 构建:wails build 必须在含 wails.json 的目录(cmd/go-zs-app)下运行,
+	// 1) 构建:wails build 必须在含 wails.json 的目录(cmd/easyssh-app)下运行,
 	//    findProjectRoot 返回的是项目根(go.mod 所在目录),需拼出 wails 项目目录。
 	projRoot, err := findProjectRoot()
 	if err != nil {
 		return "", err
 	}
-	appDir := filepath.Join(projRoot, "cmd", "go-zs-app")
+	appDir := filepath.Join(projRoot, "cmd", "easyssh-app")
 	a.logger.Printf("开始重建 GUI(wails build),项目目录: %s", appDir)
-	cmd := exec.Command("wails", "build", "-o", "go-zs-new.exe")
+	cmd := exec.Command("wails", "build", "-o", "easyssh-new.exe")
 	cmd.Dir = appDir
 	// Wails 构建会输出大量日志,捕获到变量,失败时带回显
 	out, err := cmd.CombinedOutput()
@@ -44,7 +44,7 @@ func (a *App) RebuildAndRestart() (string, error) {
 		return "", fmt.Errorf("构建失败: %v\n%s", err, tailString(string(out), 1500))
 	}
 	// wails 固定把产物输出到 <项目目录>/build/bin/,与运行中 exe 同目录则无需复制
-	built := filepath.Join(appDir, "build", "bin", "go-zs-new.exe")
+	built := filepath.Join(appDir, "build", "bin", "easyssh-new.exe")
 	if _, err := os.Stat(built); err != nil {
 		a.logger.Printf("重建完成但未找到产物 %s", built)
 		return "", fmt.Errorf("构建完成但未找到产物 %s", built)
@@ -54,8 +54,8 @@ func (a *App) RebuildAndRestart() (string, error) {
 	}
 	a.logger.Printf("重建成功:%s", newExe)
 
-	// 2) 写 restart-go-zs.bat(等当前进程退出 → 替换 → 启动 → 自删)
-	script := filepath.Join(exeDir, "restart-go-zs.bat")
+	// 2) 写 restart-easyssh.bat(等当前进程退出 → 替换 → 启动 → 自删)
+	script := filepath.Join(exeDir, "restart-easyssh.bat")
 	content := buildRestartScript(exe, newExe)
 	if err := os.WriteFile(script, []byte(content), 0o600); err != nil {
 		return "", fmt.Errorf("写入重启脚本: %w", err)
@@ -68,7 +68,7 @@ func (a *App) RebuildAndRestart() (string, error) {
 }
 
 // findProjectRoot 从当前 exe 目录(build/bin)向上找含 go.mod 且其下存在
-// cmd/go-zs-app/wails.json 的目录(即项目根)。最多向上找 6 层。
+// cmd/easyssh-app/wails.json 的目录(即项目根)。最多向上找 6 层。
 func findProjectRoot() (string, error) {
 	exe, err := os.Executable()
 	if err != nil {
@@ -76,18 +76,18 @@ func findProjectRoot() (string, error) {
 	}
 	root := findProjectRootFrom(filepath.Dir(exe))
 	if root == "" {
-		return "", fmt.Errorf("未找到项目根(需含 go.mod 与 cmd/go-zs-app/wails.json),当前 exe: %s", exe)
+		return "", fmt.Errorf("未找到项目根(需含 go.mod 与 cmd/easyssh-app/wails.json),当前 exe: %s", exe)
 	}
 	return root, nil
 }
 
 // findProjectRootFrom 从指定 exe 目录向上扫描定位项目根(核心逻辑,便于测试)。
-// 规则:向上找第一个含 go.mod 的目录,且其下存在 cmd/go-zs-app/wails.json。
+// 规则:向上找第一个含 go.mod 的目录,且其下存在 cmd/easyssh-app/wails.json。
 func findProjectRootFrom(exeDir string) string {
 	dir := exeDir
 	for i := 0; i < 8; i++ {
 		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
-			if _, err := os.Stat(filepath.Join(dir, "cmd", "go-zs-app", "wails.json")); err == nil {
+			if _, err := os.Stat(filepath.Join(dir, "cmd", "easyssh-app", "wails.json")); err == nil {
 				return dir
 			}
 		}

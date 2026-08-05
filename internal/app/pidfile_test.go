@@ -10,7 +10,7 @@ import (
 )
 
 func TestAcquirePIDFile(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "go-zs.pid")
+	path := filepath.Join(t.TempDir(), "easyssh.pid")
 	release, err := AcquirePIDFile(path)
 	if err != nil {
 		t.Fatalf("首次获取失败: %v", err)
@@ -26,7 +26,7 @@ func TestAcquirePIDFile(t *testing.T) {
 }
 
 func TestAcquirePIDFileConflict(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "go-zs.pid")
+	path := filepath.Join(t.TempDir(), "easyssh.pid")
 	if _, err := AcquirePIDFile(path); err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +46,7 @@ func TestAcquirePIDFileConflict(t *testing.T) {
 
 // TestAcquirePIDFileStale:残留的死亡 PID 应自动覆盖,不阻止启动。
 func TestAcquirePIDFileStale(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "go-zs.pid")
+	path := filepath.Join(t.TempDir(), "easyssh.pid")
 	// 写入一个几乎不可能存活的 PID
 	if err := os.WriteFile(path, []byte("999999999\n"), 0o644); err != nil {
 		t.Fatal(err)
@@ -67,7 +67,7 @@ func TestAcquirePIDFileStale(t *testing.T) {
 
 // TestAcquirePIDFileGarbage:残留的非法内容应被忽略并覆盖。
 func TestAcquirePIDFileGarbage(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "go-zs.pid")
+	path := filepath.Join(t.TempDir(), "easyssh.pid")
 	if err := os.WriteFile(path, []byte("not-a-pid"), 0o644); err != nil {
 		t.Fatal(err)
 	}

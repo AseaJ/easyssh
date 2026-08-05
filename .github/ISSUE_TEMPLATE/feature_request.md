@@ -20,7 +20,7 @@ assignees: ''
 
 ## 影响范围
 
-- [ ] 配置结构(需同步 go-zs.yaml.example 与 README)
+- [ ] 配置结构(需同步 easyssh.yaml.example 与 README)
 - [ ] CLI 命令
 - [ ] GUI
 - [ ] 部署逻辑

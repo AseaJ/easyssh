@@ -11,7 +11,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 )
 
 // ConfigView 是前端可编辑的配置结构(表单数据)。

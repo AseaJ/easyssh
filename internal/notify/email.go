@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 )
 
 // Email 通过 SMTP 发送告警邮件。
@@ -43,19 +43,19 @@ func BuildTestMail(user string, to []string) []byte {
 		Level:   "info",
 		Kind:    "test",
 		Subject: "测试通知",
-		Message: "这是一封来自 go-zs 的测试邮件。如果你收到了这封邮件,说明 SMTP 通知配置可用。",
-		Entry:   "go-zs",
+		Message: "这是一封来自 easyssh 的测试邮件。如果你收到了这封邮件,说明 SMTP 通知配置可用。",
+		Entry:   "easyssh",
 		Time:    time.Now(),
 	})
 }
 
 // buildMail 构造 MIME 邮件(UTF-8,主题 base64 编码)。
 func buildMail(cfg config.SMTPConfig, ev Event) []byte {
-	subject := mime.QEncoding.Encode("utf-8", fmt.Sprintf("[go-zs] %s", ev.Subject))
+	subject := mime.QEncoding.Encode("utf-8", fmt.Sprintf("[easyssh] %s", ev.Subject))
 	body := fmt.Sprintf("时间: %s\n级别: %s\n条目: %s\n\n%s\n",
 		ev.Time.Format("2006-01-02 15:04:05"), ev.Level, ev.Entry, ev.Message)
 	var sb strings.Builder
-	sb.WriteString("From: go-zs <" + cfg.User + ">\r\n")
+	sb.WriteString("From: easyssh <" + cfg.User + ">\r\n")
 	sb.WriteString("To: " + strings.Join([]string(cfg.To), ", ") + "\r\n")
 	sb.WriteString("Subject: " + subject + "\r\n")
 	sb.WriteString("MIME-Version: 1.0\r\n")

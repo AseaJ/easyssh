@@ -1,4 +1,4 @@
-module go-zs
+module github.com/asea/easyssh
 
 go 1.25.6
 

@@ -1,6 +1,6 @@
 # 导出/导入包格式(.zsbundle)
 
-本文档定义 `go-zs export` / `go-zs import`(及 GUI 同功能)的包格式 v1。
+本文档定义 `easyssh export` / `easyssh import`(及 GUI 同功能)的包格式 v1。
 
 ## 1. 目标
 
@@ -31,7 +31,7 @@ example.zsbundle
 ```json
 {
   "format_version": 1,
-  "kind": "go-zs-bundle",
+  "kind": "easyssh-bundle",
   "exported_at": "2026-08-04T12:00:00+08:00",
   "app_version": "0.1.0-dev",
   "scope": { "config": true, "secrets": true, "certs": true, "ssh_keys": true },

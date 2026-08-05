@@ -88,7 +88,7 @@ schedule:
 
 func writeTemp(t *testing.T, content string) string {
 	t.Helper()
-	path := filepath.Join(t.TempDir(), "go-zs.yaml")
+	path := filepath.Join(t.TempDir(), "easyssh.yaml")
 	if err := os.WriteFile(path, []byte(content), 0o600); err != nil {
 		t.Fatal(err)
 	}

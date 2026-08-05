@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"go-zs/internal/config"
+	"github.com/asea/easyssh/internal/config"
 )
 
 func TestEmailNotify(t *testing.T) {
@@ -27,7 +27,7 @@ func TestEmailNotify(t *testing.T) {
 		t.Fatal(err)
 	}
 	body := string(sent)
-	for _, want := range []string{"From: go-zs <alert@example.com>", "To: ops@example.com, admin@example.com", "Content-Type: text/plain; charset=utf-8", "Subject: =?utf-8?", "boom", "级别: error"} {
+	for _, want := range []string{"From: easyssh <alert@example.com>", "To: ops@example.com, admin@example.com", "Content-Type: text/plain; charset=utf-8", "Subject: =?utf-8?", "boom", "级别: error"} {
 		if !strings.Contains(body, want) {
 			t.Errorf("邮件内容缺少 %q:\n%s", want, body)
 		}

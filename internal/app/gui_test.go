@@ -1,4 +1,4 @@
-﻿package app
+package app
 
 import (
 	"context"
@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"go-zs/internal/certmgr"
-	"go-zs/internal/storage"
-	"go-zs/internal/testutil"
+	"github.com/asea/easyssh/internal/certmgr"
+	"github.com/asea/easyssh/internal/storage"
+	"github.com/asea/easyssh/internal/testutil"
 )
 
 // writeTestConfig 创建带一个条目的配置目录。
@@ -34,7 +34,7 @@ certificates:
       - type: nginx
         reload_cmd: nginx -s reload
 `
-	if err := os.WriteFile(filepath.Join(dir, "go-zs.yaml"), []byte(cfg), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "easyssh.yaml"), []byte(cfg), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	return dir
@@ -149,7 +149,7 @@ func TestAppReloadConfig(t *testing.T) {
 	a := NewApp(dir)
 	a.Startup(context.Background())
 	// 破坏配置 → reload 应报错
-	os.WriteFile(filepath.Join(dir, "go-zs.yaml"), []byte("certificates: []"), 0o600)
+	os.WriteFile(filepath.Join(dir, "easyssh.yaml"), []byte("certificates: []"), 0o600)
 	if _, err := a.ReloadConfig(); err == nil {
 		t.Fatal("空证书列表配置应校验失败")
 	}

@@ -21,7 +21,7 @@ import (
 	"golang.org/x/crypto/ssh/agent"
 	"golang.org/x/crypto/ssh/knownhosts"
 
-	"go-zs/internal/certmgr"
+	"github.com/asea/easyssh/internal/certmgr"
 )
 
 // SSHConfig 是 ssh 部署目标配置。
@@ -103,7 +103,7 @@ func Ping(ctx context.Context, cfg SSHConfig) error {
 		return err
 	}
 	defer client.Close()
-	if out, err := s.runRemote(client, "echo go-zs-ok"); err != nil {
+	if out, err := s.runRemote(client, "echo easyssh-ok"); err != nil {
 		return fmt.Errorf("远程命令执行失败: %v(输出: %s)", err, strings.TrimSpace(string(out)))
 	}
 	return nil
@@ -260,7 +260,7 @@ func (s *SSH) dial(ctx context.Context) (*ssh.Client, error) {
 func (s *SSH) hostKeyCallback() (ssh.HostKeyCallback, error) {
 	if s.cfg.KnownHosts == "" {
 		return nil, errors.New("SSH 部署未配置 known_hosts 路径(防中间人攻击必需);" +
-			"请在配置中设置 known_hosts,如: ssh-keyscan <host> >> /etc/go-zs/known_hosts")
+			"请在配置中设置 known_hosts,如: ssh-keyscan <host> >> /etc/easyssh/known_hosts")
 	}
 	khPath, err := expandHome(s.cfg.KnownHosts)
 	if err != nil {

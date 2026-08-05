@@ -56,7 +56,7 @@ func broadcastEnvChanged() {
 }
 
 // LoadPersistedEnv 从用户环境变量注册表加载缺失的变量到当前进程。
-// 兜底机制:即使系统未广播刷新,go-zs 也能拿到先前保存的密钥。
+// 兜底机制:即使系统未广播刷新,easyssh 也能拿到先前保存的密钥。
 func LoadPersistedEnv() {
 	k, err := registry.OpenKey(registry.CURRENT_USER, `Environment`, registry.QUERY_VALUE)
 	if err != nil {

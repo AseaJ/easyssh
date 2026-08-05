@@ -6,13 +6,13 @@ import (
 	"testing"
 )
 
-// makeLayout 构造模拟真实布局:<root>/cmd/go-zs-app/build/bin 为 exe 目录,root 下放 go.mod。
-// wantCfg 为 true 时在 root 下放 go-zs.yaml。
+// makeLayout 构造模拟真实布局:<root>/cmd/easyssh-app/build/bin 为 exe 目录,root 下放 go.mod。
+// wantCfg 为 true 时在 root 下放 easyssh.yaml。
 func makeLayout(t *testing.T, wantCfg bool) (root, bin string) {
 	t.Helper()
 	dir := t.TempDir()
 	root = filepath.Join(dir, "root")
-	bin = filepath.Join(root, "cmd", "go-zs-app", "build", "bin")
+	bin = filepath.Join(root, "cmd", "easyssh-app", "build", "bin")
 	if err := os.MkdirAll(bin, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -20,7 +20,7 @@ func makeLayout(t *testing.T, wantCfg bool) (root, bin string) {
 		t.Fatal(err)
 	}
 	if wantCfg {
-		if err := os.WriteFile(filepath.Join(root, "go-zs.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
+		if err := os.WriteFile(filepath.Join(root, "easyssh.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
 			t.Fatal(err)
 		}
 	}
@@ -38,7 +38,7 @@ func TestFindConfigDirFromProjectRoot(t *testing.T) {
 // exe 所在目录有配置:应优先用 exe 目录(比项目根更高优先级)。
 func TestFindConfigDirPrefersExeDir(t *testing.T) {
 	_, bin := makeLayout(t, true)
-	if err := os.WriteFile(filepath.Join(bin, "go-zs.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(bin, "easyssh.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if got := findConfigDirFrom(bin, t.TempDir()); got != bin {
@@ -49,7 +49,7 @@ func TestFindConfigDirPrefersExeDir(t *testing.T) {
 // 工作目录有配置:兜底使用。
 func TestFindConfigDirFallsBackToCwd(t *testing.T) {
 	dir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dir, "go-zs.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "easyssh.yaml"), []byte("certificates: []\n"), 0o600); err != nil {
 		t.Fatal(err)
 	}
 	if got := findConfigDirFrom(filepath.Join(dir, "no-such-exe"), dir); got != dir {
