@@ -1,8 +1,25 @@
 # go-zs — 证书自动化托管工具
 
+[![Go Version](https://img.shields.io/badge/Go-1.25-blue)](https://go.dev)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<!-- 仓库创建后取消注释并替换路径:
+[![CI](https://github.com/<用户名>/go-zs/actions/workflows/ci.yml/badge.svg)](https://github.com/<用户名>/go-zs/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/<用户名>/go-zs)](https://github.com/<用户名>/go-zs/releases)
+-->
+
 go-zs 是一个证书自动化托管工具:自动签发(ACME)、自动续期、自动部署到反向代理(本地/SSH 远程),并提供简洁的桌面仪表盘(GUI)与 headless CLI 双形态。
 
 > ⚠️ 当前为开发版本(0.1.0-dev)。默认连接 Let's Encrypt **staging** 环境,请先跑通后再切换到正式环境。
+
+## 平台支持
+
+| 形态 | Windows | Linux | macOS |
+|---|---|---|---|
+| CLI(headless) | ✅ | ✅(交叉编译) | ✅(交叉编译) |
+| GUI(Wails) | ✅ | ⚠️ 需 webkit2gtk,密钥持久化暂缺 | ⚠️ 需 webkit2gtk |
+
+- Linux/macOS 的 CLI 可在 Windows 上交叉编译(`GOOS=linux GOARCH=amd64 go build ./cmd/go-zs`)
+- Linux/macOS GUI 桌面端:密钥持久化(Windows 注册表)在非 Windows 平台暂未实现,密钥需通过环境变量注入
 
 ## 功能特性
 
@@ -159,7 +176,7 @@ certs/example/
 
 - 开源的是**代码**,不是数据:证书、私钥、账号密钥全部留在使用者本机
 - 私钥落盘权限 0600;`{{env:VAR}}` 引用密钥,配置文件中不出现明文
-- SSH 部署走加密通道,私钥传输不落明文临时文件
+- SSH 部署走加密通道,私钥传输不落明文临时文件;**必须配置 `known_hosts`**,未配置时拒绝连接(防中间人):`ssh-keyscan <host> >> known_hosts`
 - 生产使用前务必切换到正式 CA,并在真实域名上验证
 - **导出包**含密钥/私钥时用口令加密(AES-256-GCM,scrypt 派生);口令即唯一防线,丢失无法恢复。含敏感数据的 `.zsbundle` 请经安全渠道(加密传输/当面拷贝)传递,切勿明文放网盘/邮件
 

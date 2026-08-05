@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request: {}
+
+jobs:
+  test:
+    name: Test (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: 静态检查
+        run: go vet ./...
+
+      - name: 单元测试
+        run: go test ./... -cover
+
+      - name: 依赖漏洞扫描
+        uses: golang/govulncheck-action@v1
+        with:
+          go-version-input: "1.25"
+          go-package: ./...
+
+  build-matrix:
+    name: Build (${{ matrix.os }} / ${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, goos: linux, arch: amd64 }
+          - { os: ubuntu-latest, goos: linux, arch: arm64 }
+          - { os: windows-latest, goos: windows, arch: amd64 }
+          - { os: windows-latest, goos: windows, arch: arm64 }
+          - { os: darwin-latest, goos: darwin, arch: amd64 }
+          - { os: darwin-latest, goos: darwin, arch: arm64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: 交叉编译 CLI
+        shell: bash
+        run: |
+          mkdir -p dist
+          GOOS=${{ matrix.goos }} GOARCH=${{ matrix.arch }} CGO_ENABLED=0 \
+          go build -o dist/go-zs ./cmd/go-zs
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-zs-${{ matrix.goos }}-${{ matrix.arch }}
+          path: dist/
+          if-no-files-found: error

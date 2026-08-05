@@ -1,0 +1,36 @@
+version: 2
+updates:
+  # Go 依赖
+  - package-ecosystem: gomod
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    # 忽略大版本升级(可能引入破坏性变更,人工评估)
+    ignore:
+      - dependency-name: "github.com/wailsapp/wails/v2"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "github.com/go-acme/lego/v4"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+
+  # 前端(GUI)
+  - package-ecosystem: npm
+    directory: /cmd/go-zs-app/frontend
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
