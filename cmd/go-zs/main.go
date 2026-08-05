@@ -22,7 +22,8 @@ import (
 	"go-zs/internal/storage"
 )
 
-const version = "0.1.0-dev"
+// version 是 CLI 版本号,构建时可通过 -ldflags "-X main.version=vX.Y.Z" 注入。
+var version = "0.1.0-dev"
 
 func main() {
 	// Windows:从注册表加载先前持久化的环境变量(密钥),CLI 与 GUI 行为一致
@@ -99,7 +100,6 @@ func newListCmd() *cobra.Command {
 				notAfter                           time.Time
 			}
 			var rows []row
-			now := time.Now()
 			for _, c := range cfg.Certificates {
 				f, err := storage.NewFS(c.Storage.Dir)
 				if err != nil {
@@ -138,7 +138,6 @@ func newListCmd() *cobra.Command {
 				}
 				fmt.Printf("%-16s %-42s %-8s %-10s %-12s %s\n", r.name, r.domains, r.remain, r.status, r.fp, na)
 			}
-			_ = now
 			return nil
 		},
 	}
