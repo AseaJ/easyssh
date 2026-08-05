@@ -30,7 +30,7 @@ updates:
 
   # 前端(GUI)
   - package-ecosystem: npm
-    directory: /cmd/go-zs-app/frontend
+    directory: /cmd/easyssh-app/frontend
     schedule:
       interval: monthly
     open-pull-requests-limit: 3

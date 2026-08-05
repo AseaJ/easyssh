@@ -2,11 +2,12 @@
 *.exe
 *.pid
 *.log
-go-zs-test.exe
-go-zs-new.exe
+easyssh-test.exe
+easyssh-new.exe
 dist/
 
-# ---- 真实运行数据（绝不入库，只用 go-zs.yaml.example 做模板） ----
+# ---- 真实运行数据（绝不入库，只用 easyssh.yaml.example 做模板） ----
+easyssh.yaml
 go-zs.yaml
 data/
 certs/

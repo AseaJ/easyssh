@@ -7,7 +7,7 @@ easyssh 托管 ACME 私钥、证书与 SSH 凭据,**任何安全问题都可能�
 
 **不要公开提交 issue。** 请通过以下方式私下联系维护者:
 
-- 邮件:`z1973135690@gmail.com`(待填写)
+- 邮件:`z1973135690@gmail.com`
 - 或 GitHub Security Advisory(仓库 → Security → Report a vulnerability)
 
 请在报告中包含:

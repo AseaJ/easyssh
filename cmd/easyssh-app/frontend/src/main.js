@@ -1,4 +1,4 @@
-// go-zs 仪表盘前端。
+﻿// easyssh 仪表盘前端。
 // 通过 window.go.app.App 调用 Go 端绑定方法(Wails 运行时注入)。
 const go = () => window.go.app.App;
 
@@ -17,11 +17,11 @@ function toast(msg, ok = true) {
 // 全局错误捕获:任何渲染/调用异常都显示出来,便于定位
 window.addEventListener("error", (e) => {
   toast("脚本错误: " + (e.message || e.error), false);
-  console.error("[go-zs] 脚本错误:", e.error || e.message);
+  console.error("[easyssh] 脚本错误:", e.error || e.message);
 });
 window.addEventListener("unhandledrejection", (e) => {
   toast("调用失败: " + (e.reason || e), false);
-  console.error("[go-zs] 未处理拒绝:", e.reason);
+  console.error("[easyssh] 未处理拒绝:", e.reason);
 });
 
 const statusMeta = {
@@ -449,7 +449,7 @@ async function loadConfigForm() {
     renderConfigForm(cfg);
   } catch (e) {
     toast("加载配置失败: " + (e && e.message ? e.message : e), false);
-    console.error("[go-zs] GetConfig 失败:", e);
+    console.error("[easyssh] GetConfig 失败:", e);
   }
 }
 
@@ -499,7 +499,7 @@ function renderConfigForm(cfg) {
       (certsHtml || '<div class="muted" style="padding:8px 0">未配置证书条目</div>');
   } catch (e) {
     toast("渲染配置表单失败: " + (e && e.message ? e.message : e), false);
-    console.error("[go-zs] 渲染表单失败:", e);
+    console.error("[easyssh] 渲染表单失败:", e);
   }
 }
 
@@ -979,7 +979,7 @@ async function loadNotifyForm() {
     renderNotifyForm(cfg);
   } catch (e) {
     toast("加载通知设置失败: " + (e && e.message ? e.message : e), false);
-    console.error("[go-zs] GetConfig(通知) 失败:", e);
+    console.error("[easyssh] GetConfig(通知) 失败:", e);
   }
 }
 
@@ -1244,8 +1244,8 @@ document.getElementById("btn-confirm-export").addEventListener("click", async ()
   let outPath = "";
   try {
     outPath = await go().SelectSavePath({
-      DefaultFilename: "go-zs-export.zsbundle",
-      Filters: [{ DisplayName: "go-zs 导出包", Pattern: "*.zsbundle" }],
+      DefaultFilename: "easyssh-export.zsbundle",
+      Filters: [{ DisplayName: "easyssh 导出包", Pattern: "*.zsbundle" }],
     });
   } catch (e) { outPath = ""; }
   if (!outPath) {
@@ -1266,7 +1266,7 @@ document.getElementById("btn-import-bundle").addEventListener("click", async () 
   let filePath = "";
   try {
     filePath = await go().SelectOpenPath({
-      Filters: [{ DisplayName: "go-zs 导出包", Pattern: "*.zsbundle" }],
+      Filters: [{ DisplayName: "easyssh 导出包", Pattern: "*.zsbundle" }],
     });
   } catch (e) { filePath = ""; }
   if (!filePath) {
