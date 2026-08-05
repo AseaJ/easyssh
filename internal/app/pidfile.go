@@ -11,6 +11,9 @@ import (
 
 // AcquirePIDFile 以 PID 文件方式获取单实例锁。
 // 返回的 release 函数释放锁并删除文件。
+//
+// 若 PID 文件中的进程已不存在(残留),会自动覆盖并重新获取,
+// 避免崩溃后残留文件导致无法启动。
 func AcquirePIDFile(path string) (release func(), err error) {
 	if path == "" {
 		// 未配置 PID 文件,不启用单实例保护
@@ -19,7 +22,10 @@ func AcquirePIDFile(path string) (release func(), err error) {
 	if data, rerr := os.ReadFile(path); rerr == nil {
 		pidStr := strings.TrimSpace(string(data))
 		if pid, perr := strconv.Atoi(pidStr); perr == nil && pid > 0 {
-			return nil, fmt.Errorf("已有 go-zs 实例运行(PID %d,%s),如需强制启动请删除该文件", pid, path)
+			if processAlive(pid) {
+				return nil, fmt.Errorf("%w: 已有 go-zs 实例运行(PID %d,%s)", ErrLocked, pid, path)
+			}
+			// PID 已死:残留文件,覆盖继续
 		}
 		// 残留的非法内容,忽略并覆盖
 	}
