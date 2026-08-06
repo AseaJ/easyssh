@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.goos }} / ${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: linux, arch: amd64 }
+          - { goos: linux, arch: arm64 }
+          - { goos: windows, arch: amd64 }
+          - { goos: windows, arch: arm64 }
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+          cache: true
+
+      - name: 提取版本号 (tag)
+        id: version
+        shell: bash
+        run: |
+          # tag 形如 v0.2.0 → 版本号 0.2.0
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=$GITHUB_REF_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: 交叉编译 CLI
+        shell: bash
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: "0"
+        run: |
+          EXE=""
+          [ "$GOOS" = "windows" ] && EXE=".exe"
+          go build \
+            -trimpath \
+            -ldflags "-s -w -X main.version=v${{ steps.version.outputs.version }}" \
+            -o "dist/easyssh-${GOOS}-${GOARCH}${EXE}" \
+            ./cmd/easyssh
+
+      - name: 上传构建产物 (artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.goos }}-${{ matrix.arch }}
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    name: 发布 GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts/
+          merge-multiple: true
+
+      - name: 生成统一 checksum
+        shell: bash
+        run: |
+          cd artifacts
+          sha256sum * > checksums.txt
+          cat checksums.txt
+
+      - name: 生成 Release 备注
+        id: notes
+        shell: bash
+        run: |
+          # 若 CHANGELOG 有对应版本段则取之,否则用简单模板
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [ -f CHANGELOG.md ]; then
+            awk -v ver="[$VERSION]" '
+              index($0, "## " ver) == 1 { found=1; next }
+              found && /^## / { exit }
+              found { print }
+            ' CHANGELOG.md > notes.md
+            [ -s notes.md ] || echo "此版本的详细变更见 CHANGELOG.md。" > notes.md
+          fi
+          echo "--- 生成的 Release 备注 ---"
+          cat notes.md
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: easyssh ${{ github.ref_name }}
+          body_path: notes.md
+          files: artifacts/*
+          fail_on_unmatched_files: true
