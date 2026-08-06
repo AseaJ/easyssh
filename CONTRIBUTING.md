@@ -46,7 +46,46 @@ go vet ./...
 
 ## 流程
 
-1. Fork 仓库并创建功能分支:`git checkout -b feat/my-feature`
-2. 提交改动(小步、清晰)
-3. 推送并开 PR,描述里写清"改了什么、为什么、如何验证"
-4. 维护者 review 后会给出反馈,通常 1-2 轮内可合并
+本项目采用标准开源协作流程:**外部贡献者无法直接修改 `master`,所有改动通过 Pull Request 合并。**
+
+### 外部贡献者(Fork 流程)
+
+1. 点击仓库右上角 **Fork**,把仓库复制到你自己的 GitHub 账号下
+2. 克隆你的 Fork 到本地,并添加上游仓库:
+
+   ```bash
+   git clone https://github.com/<你的用户名>/easyssh.git
+   cd easyssh
+   git remote add upstream https://github.com/AseaJ/easyssh.git
+   ```
+
+3. 创建功能分支(基于最新的上游 master):
+
+   ```bash
+   git fetch upstream
+   git checkout -b feat/my-feature upstream/master
+   ```
+
+4. 提交改动(小步、清晰,遵循 Conventional Commits)
+5. 推送到你的 Fork 并开 PR:
+
+   ```bash
+   git push origin feat/my-feature
+   ```
+
+6. 在 GitHub 上点 **New pull request**,选 `AseaJ/easyssh:master` ← `你的用户名:feat/my-feature`
+7. PR 描述里写清"改了什么、为什么、如何验证"
+8. 维护者 review + CI 自动检查通过后合并
+
+> **保持同步**:下次开发前先 `git fetch upstream && git merge upstream/master`(或 rebase),
+> 避免与上游产生冲突。
+
+### 维护者合并规范
+
+- 所有改动必须通过 **PR** 合并,禁止直接 push 到 `master`(已由分支保护规则强制)
+- 合并前需满足:
+  - CI 通过(`go vet` / `go test` / 依赖漏洞扫描)
+  - 至少 1 位维护者 review 且对话已解决
+  - 涉及安全改动(私钥/证书/加密)需额外说明威胁模型
+- 合并方式建议 **Squash and merge**(压缩为单个提交,历史更清晰)
+- 发版流程:在 `master` 上打 tag(`vX.Y.Z`)并推送,CI 会自动构建 Release(见 README)
