@@ -22,6 +22,10 @@ export function GetOverview() {
   return window['go']['app']['App']['GetOverview']();
 }
 
+export function HideToTray() {
+  return window['go']['app']['App']['HideToTray']();
+}
+
 export function ImportBundle(arg1) {
   return window['go']['app']['App']['ImportBundle'](arg1);
 }
@@ -36,6 +40,10 @@ export function LogWriter() {
 
 export function PreviewImportBundle(arg1) {
   return window['go']['app']['App']['PreviewImportBundle'](arg1);
+}
+
+export function QuitFromTray() {
+  return window['go']['app']['App']['QuitFromTray']();
 }
 
 export function RebuildAndRestart() {
@@ -68,6 +76,10 @@ export function SelectOpenPath(arg1) {
 
 export function SelectSavePath(arg1) {
   return window['go']['app']['App']['SelectSavePath'](arg1);
+}
+
+export function SetAutostartMode() {
+  return window['go']['app']['App']['SetAutostartMode']();
 }
 
 export function TestNotify() {

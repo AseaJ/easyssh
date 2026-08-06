@@ -33,7 +33,7 @@ example.zsbundle
   "format_version": 1,
   "kind": "easyssh-bundle",
   "exported_at": "2026-08-04T12:00:00+08:00",
-  "app_version": "0.1.0-dev",
+  "app_version": "0.2.0",
   "scope": { "config": true, "secrets": true, "certs": true, "ssh_keys": true },
   "kdf": { "algo": "scrypt", "n": 131072, "r": 8, "p": 1, "key_len": 32 },
   "certs": [ { "name": "example", "domains": ["example.com"] } ],

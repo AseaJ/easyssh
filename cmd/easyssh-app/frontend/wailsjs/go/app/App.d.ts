@@ -15,6 +15,8 @@ export function GetLogs(arg1:number):Promise<Array<logring.Entry>>;
 
 export function GetOverview():Promise<app.Overview>;
 
+export function HideToTray():Promise<void>;
+
 export function ImportBundle(arg1:app.ImportRequest):Promise<string>;
 
 export function ListCertificates():Promise<Array<app.CertView>>;
@@ -22,6 +24,8 @@ export function ListCertificates():Promise<Array<app.CertView>>;
 export function LogWriter():Promise<io.Writer>;
 
 export function PreviewImportBundle(arg1:app.ImportPreviewRequest):Promise<app.ImportPreview>;
+
+export function QuitFromTray():Promise<void>;
 
 export function RebuildAndRestart():Promise<string>;
 
@@ -38,6 +42,8 @@ export function SaveConfig(arg1:app.ConfigView):Promise<string>;
 export function SelectOpenPath(arg1:frontend.OpenDialogOptions):Promise<string>;
 
 export function SelectSavePath(arg1:frontend.SaveDialogOptions):Promise<string>;
+
+export function SetAutostartMode():Promise<void>;
 
 export function TestNotify():Promise<string>;
 

@@ -30,6 +30,7 @@ type ConfigView struct {
 	SMTPTo         []string       `json:"smtp_to,omitempty"`   // 收件人,可多个
 	NotifyExpiring bool           `json:"notify_expiring"`     // 即将到期提醒开关
 	NotifySuccess  bool           `json:"notify_success"`      // 续期/部署成功提醒开关
+	Autostart      bool           `json:"autostart"`           // 开机自启(用户级 HKCU Run 键,非 yaml 配置项)
 	Hosts          []HostEditView `json:"hosts,omitempty"`
 	Certificates   []CertEditView `json:"certificates"`
 }
@@ -110,6 +111,7 @@ func (a *App) GetConfig() (ConfigView, error) {
 		SMTPTo:         []string(c.Notify.SMTP.To),
 		NotifyExpiring: c.Notify.Events.Expiring,
 		NotifySuccess:  c.Notify.Events.Success,
+		Autostart:      AutostartEnabled(),
 	}
 	for _, d := range c.Schedule.RetryBackoff {
 		view.RetryBackoff = append(view.RetryBackoff, durString(d.Std()))
@@ -205,6 +207,10 @@ func (a *App) SaveConfig(view ConfigView) (string, error) {
 	}
 	if err := atomicWriteFile(a.cfgPath(), data); err != nil {
 		return "", fmt.Errorf("写入配置 %s: %w", a.cfgPath(), err)
+	}
+	// 开机自启设置(应用级偏好,独立于 yaml 配置;失败仅提示不阻断保存)
+	if err := SetAutostart(view.Autostart); err != nil {
+		return "", fmt.Errorf("配置已写入但开机自启设置失败: %w", err)
 	}
 	// 重新加载
 	if err := a.reload(); err != nil {

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  easyssh — 主标(横版,浅色背景使用)
+  左:主图标;右:品牌名 easy(深蓝)+ ssh(终端绿),下方产品副标题。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-label="easyssh">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#17456F"/>
+      <stop offset="1" stop-color="#0A1F38"/>
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3DDC97"/>
+      <stop offset="1" stop-color="#1E9E5A"/>
+    </linearGradient>
+    <g id="mark">
+      <rect x="20" y="20" width="472" height="472" rx="118" fill="url(#bg)"/>
+      <path d="M 156 172 Q 156 140 188 140 L 324 140 Q 356 140 356 172 L 356 274 Q 356 346 308 380 L 256 414 L 204 380 Q 156 346 156 274 Z" fill="#F8FAFC"/>
+      <path d="M 275.4 206.3 A 46 46 0 1 1 236.6 206.3" fill="none" stroke="url(#key)" stroke-width="15" stroke-linecap="round"/>
+      <polygon points="256,184 244,206 268,206" fill="#FFFFFF"/>
+      <path d="M 256 248 V 368" stroke="url(#key)" stroke-width="20" stroke-linecap="round"/>
+      <rect x="266" y="294" width="28" height="14" rx="7" fill="url(#key)"/>
+      <rect x="266" y="328" width="22" height="14" rx="7" fill="url(#key)"/>
+    </g>
+  </defs>
+
+  <use href="#mark" transform="translate(10,10) scale(0.2734375)"/>
+
+  <!-- 品牌名:easy(深蓝)+ ssh(终端绿),双色连排 -->
+  <text x="185" y="102" font-family="'Inter','SF Pro Display','Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="62" font-weight="800" letter-spacing="-1" fill="#123254">easy</text>
+  <text x="317" y="102" font-family="'JetBrains Mono','Cascadia Code','Consolas',monospace"
+        font-size="62" font-weight="700" letter-spacing="-1" fill="#1E9E5A">ssh</text>
+
+  <!-- 副标题 -->
+  <text x="189" y="134" font-family="'Inter','Segoe UI','Helvetica Neue',Arial,sans-serif"
+        font-size="15" font-weight="600" letter-spacing="4.5" fill="#64748B">CERTIFICATE AUTOMATION</text>
+</svg>

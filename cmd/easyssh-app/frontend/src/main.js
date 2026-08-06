@@ -1,4 +1,4 @@
-﻿// easyssh 仪表盘前端。
+// easyssh 仪表盘前端。
 // 通过 window.go.app.App 调用 Go 端绑定方法(Wails 运行时注入)。
 const go = () => window.go.app.App;
 
@@ -488,6 +488,13 @@ function renderConfigForm(cfg) {
           ${field("续期阈值", "renew_before", cfg.renew_before, { placeholder: "30d" })}
           ${field("退避序列(逗号分隔)", "retry_backoff", (cfg.retry_backoff || []).join(","))}
         </div>
+      </div>
+      <div class="form-section">
+        <h3>系统</h3>
+        <div class="switch-group">
+          ${switchField("开机自启", "autostart", !!cfg.autostart, "登录 Windows 后自动以托盘后台模式运行,证书续期/部署不再依赖手动打开应用")}
+        </div>
+        <div class="muted" style="margin-top:4px;font-size:12px">启用后,关闭窗口将隐藏到系统托盘继续后台运行;点托盘「退出」才真正退出。</div>
       </div>`;
     document.getElementById("cfg-hosts").innerHTML = `
       ${hostsHtml || '<div class="muted" style="padding:8px 0 12px">未定义主机,可在此新增或删除</div>'}
@@ -524,6 +531,7 @@ function collectConfig(baseCfg) {
       .split(/\r?\n/).map((s) => s.trim()).filter(Boolean),
     notify_expiring: checkedOr("notify_expiring", base.notify_expiring ?? false),
     notify_success: checkedOr("notify_success", base.notify_success ?? false),
+    autostart: checkedOr("autostart", base.autostart ?? false),
     hosts: [],
     certificates: [],
   };

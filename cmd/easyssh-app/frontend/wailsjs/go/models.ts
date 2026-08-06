@@ -153,6 +153,7 @@ export namespace app {
 	    smtp_to?: string[];
 	    notify_expiring: boolean;
 	    notify_success: boolean;
+	    autostart: boolean;
 	    hosts?: HostEditView[];
 	    certificates: CertEditView[];
 	
@@ -176,6 +177,7 @@ export namespace app {
 	        this.smtp_to = source["smtp_to"];
 	        this.notify_expiring = source["notify_expiring"];
 	        this.notify_success = source["notify_success"];
+	        this.autostart = source["autostart"];
 	        this.hosts = this.convertValues(source["hosts"], HostEditView);
 	        this.certificates = this.convertValues(source["certificates"], CertEditView);
 	    }
@@ -350,6 +352,7 @@ export namespace app {
 	    port?: number;
 	    user?: string;
 	    key?: string;
+	    known_hosts?: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new SSHTestParams(source);
@@ -362,6 +365,7 @@ export namespace app {
 	        this.port = source["port"];
 	        this.user = source["user"];
 	        this.key = source["key"];
+	        this.known_hosts = source["known_hosts"];
 	    }
 	}
 

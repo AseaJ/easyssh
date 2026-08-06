@@ -23,7 +23,7 @@ import (
 )
 
 // version 是 CLI 版本号,构建时可通过 -ldflags "-X main.version=vX.Y.Z" 注入。
-var version = "0.1.0-dev"
+var version = "0.2.0"
 
 func main() {
 	// Windows:从注册表加载先前持久化的环境变量(密钥),CLI 与 GUI 行为一致
@@ -49,6 +49,7 @@ func newRootCmd() *cobra.Command {
 	root.AddCommand(newRenewCmd())
 	root.AddCommand(newExportCmd())
 	root.AddCommand(newImportCmd())
+	root.AddCommand(newAutostartCmd())
 	return root
 }
 
@@ -306,6 +307,52 @@ func newServeCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&pidFile, "pidfile", "easyssh.pid", "PID 文件路径(单实例锁);为空则禁用")
+	return cmd
+}
+
+func newAutostartCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "autostart",
+		Short: "管理开机自启(用户级 HKCU Run 键)",
+		Long: "管理用户级开机自启。\n" +
+			"  enable   启用开机自启(当前用户登录时自动以托盘后台模式启动 GUI)\n" +
+			"  disable  禁用开机自启\n" +
+			"  status   查看当前自启状态",
+	}
+	cmd.AddCommand(&cobra.Command{
+		Use:   "enable",
+		Short: "启用开机自启",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.SetAutostart(true); err != nil {
+				return err
+			}
+			fmt.Printf("已启用开机自启(GUI 将以托盘后台模式启动)\n")
+			return nil
+		},
+	})
+	cmd.AddCommand(&cobra.Command{
+		Use:   "disable",
+		Short: "禁用开机自启",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := app.SetAutostart(false); err != nil {
+				return err
+			}
+			fmt.Printf("已禁用开机自启\n")
+			return nil
+		},
+	})
+	cmd.AddCommand(&cobra.Command{
+		Use:   "status",
+		Short: "查看开机自启状态",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if app.AutostartEnabled() {
+				fmt.Printf("开机自启: 已启用\n")
+			} else {
+				fmt.Printf("开机自启: 未启用\n")
+			}
+			return nil
+		},
+	})
 	return cmd
 }
 

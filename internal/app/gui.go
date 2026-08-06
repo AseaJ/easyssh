@@ -35,6 +35,9 @@ type App struct {
 	lastRun    time.Time     // 最近一次扫描/操作时间(概览展示)
 	lastScan   time.Time     // 自动调度循环最近一次实际执行扫描的时间(按 check_interval 触发)
 	lastError  string
+	tray       *trayHandle   // Windows 托盘图标(非 Windows 为 nil)
+	quitting   bool          // 托盘"退出"标志:置 true 后 runtime.Quit 不被 OnBeforeClose 拦截
+	autostartMode bool       // --autostart 启动:开机自启模式,窗口默认隐藏
 }
 
 // snap 返回当前配置与调度器的快照指针。reload 总是构造新对象后原子替换指针,
@@ -55,6 +58,12 @@ func NewApp(configDir string) *App {
 	return &App{configDir: configDir, logger: logger, logs: logs}
 }
 
+// SetAutostartMode 标记本次为开机自启模式(窗口默认隐藏,仅托盘后台)。
+// 在 wails.Run 前调用。托盘初始化失败时自启模式会直接退出而非隐藏成无入口进程。
+func (a *App) SetAutostartMode() {
+	a.autostartMode = true
+}
+
 // LogWriter 返回日志写入器(供全局 log.SetOutput 使用,收集 lego 等三方日志)。
 func (a *App) LogWriter() io.Writer {
 	return a.logs
@@ -72,6 +81,19 @@ func (a *App) Startup(ctx context.Context) {
 		a.logger.Printf("配置加载成功:%s", a.cfgPath())
 		go a.autoLoop() // GUI 打开后按 check_interval 自动扫描(与 serve 模式一致)
 	}
+	// 启动托盘图标(失败仅记日志,不阻断应用;非 Windows 无托盘)
+	trayErr := a.startTray()
+	if trayErr != nil {
+		a.logger.Printf("托盘初始化失败: %v", trayErr)
+		// --autostart 自启模式下托盘是唯一交互入口,失败则退出,避免隐藏窗口后无法恢复
+		if a.autostartMode {
+			a.lastError = fmt.Sprintf("托盘初始化失败(自启模式),请手动打开应用: %v", trayErr)
+			a.quitting = true // 置位放行 BeforeClose,确保 runtime.Quit 真正退出
+			wailsQuit(a.ctx)
+		}
+	}
+	// 缓存主窗口 hwnd(供托盘"打开界面/隐藏"切换任务栏按钮;StartHidden 时窗口未显示,延迟到首次显示)
+	cacheMainWindow()
 }
 
 // autoLoop 自动调度循环:每 1 分钟检查一次是否到 check_interval,到点执行全量扫描。

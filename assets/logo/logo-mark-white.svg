@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  easyssh — 单色图标(白色,透明背景)
+  用于深色背景、深色 UI、夜间模式、水印叠加等场景。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="easyssh">
+  <!-- 盾牌 -->
+  <path d="M 156 172
+           Q 156 140 188 140
+           L 324 140
+           Q 356 140 356 172
+           L 356 274
+           Q 356 346 308 380
+           L 256 414
+           L 204 380
+           Q 156 346 156 274
+           Z"
+        fill="#FFFFFF"/>
+
+  <!-- 钥匙环(开口) -->
+  <path d="M 275.4 206.3 A 46 46 0 1 1 236.6 206.3"
+        fill="none" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"/>
+
+  <!-- 旋转箭头(负空间) -->
+  <polygon points="256,184 244,206 268,206" fill="#0A1F38"/>
+
+  <!-- 钥匙杆 -->
+  <path d="M 256 248 V 368" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- 钥匙齿 -->
+  <rect x="266" y="294" width="28" height="14" rx="7" fill="#FFFFFF"/>
+  <rect x="266" y="328" width="22" height="14" rx="7" fill="#FFFFFF"/>
+</svg>

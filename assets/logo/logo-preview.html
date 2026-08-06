@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>easyssh — Logo 预览</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; background: #0B1D30; color: #E2E8F0; }
+  header { padding: 28px 32px 8px; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  p.sub { margin: 0; color: #94A3B8; font-size: 13px; }
+  main { padding: 12px 32px 40px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .card { background: #122B47; border: 1px solid #1E3A5F; border-radius: 12px; padding: 16px; }
+  .card h2 { margin: 0 0 10px; font-size: 14px; color: #A8C4DC; font-weight: 600; }
+  .stage { border-radius: 10px; display: flex; align-items: center; justify-content: center; min-height: 160px; overflow: hidden; }
+  .stage img { max-width: 100%; max-height: 300px; }
+  .stage.light { background: #FFFFFF; }
+  .stage.dark { background: #0B1D30; }
+  .stage.paper { background: #F1F5F9; }
+  .file { margin-top: 8px; font-size: 11px; color: #64748B; font-family: Consolas, monospace; word-break: break-all; }
+  .row { display: flex; gap: 14px; align-items: center; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: #1E9E5A; color: #fff; }
+</style>
+</head>
+<body>
+<header>
+  <h1>easyssh — Logo 全套预览 <span class="badge">盾牌 · 钥匙 · 自动续期</span></h1>
+  <p class="sub">深空蓝 = 信任/技术,终端绿 = SSL/终端/续期成功。所有源文件为 SVG(矢量,可无限缩放)。</p>
+</header>
+<main>
+  <div class="card">
+    <h2>主图标 logo-mark.svg</h2>
+    <div class="stage dark"><img src="logo-mark.svg" alt="logo-mark"></div>
+    <div class="file">assets/logo/logo-mark.svg — 应用图标 / favicon / 头像</div>
+  </div>
+  <div class="card">
+    <h2>主标(浅色) logo.svg</h2>
+    <div class="stage light"><img src="logo.svg" alt="logo"></div>
+    <div class="file">assets/logo/logo.svg — 文档 / 网站浅色区域</div>
+  </div>
+  <div class="card">
+    <h2>主标(深色) logo-dark.svg</h2>
+    <div class="stage dark"><img src="logo-dark.svg" alt="logo-dark"></div>
+    <div class="file">assets/logo/logo-dark.svg — 深色 UI / 深色背景</div>
+  </div>
+  <div class="card">
+    <h2>单色黑 logo-mark-mono.svg</h2>
+    <div class="stage paper"><img src="logo-mark-mono.svg" alt="mono"></div>
+    <div class="file">assets/logo/logo-mark-mono.svg — 打印 / 水印 / 单色 UI</div>
+  </div>
+  <div class="card">
+    <h2>单色白 logo-mark-white.svg</h2>
+    <div class="stage dark"><img src="logo-mark-white.svg" alt="white"></div>
+    <div class="file">assets/logo/logo-mark-white.svg — 深色背景水印</div>
+  </div>
+  <div class="card" style="grid-column: 1 / -1;">
+    <h2>仓库横幅 banner.svg (1500×500)</h2>
+    <div class="stage dark"><img src="banner.svg" alt="banner"></div>
+    <div class="file">assets/logo/banner.svg — GitHub 仓库封面 / README 顶部 / 社交横幅</div>
+  </div>
+  <div class="card">
+    <h2>备选概念 B variant-terminal.svg</h2>
+    <div class="stage dark"><img src="variant-terminal.svg" alt="variant"></div>
+    <div class="file">assets/logo/variant-terminal.svg — 终端 &gt;_ + 盾牌对勾(备选,未采用)</div>
+  </div>
+  <div class="card">
+    <h2>favicon.ico / favicon-*.png</h2>
+    <div class="stage light row" style="gap: 18px; min-height: 90px;">
+      <img src="favicon-16.png" width="16" height="16" alt="16">
+      <img src="favicon-32.png" width="32" height="32" alt="32">
+      <img src="favicon-48.png" width="48" height="48" alt="48">
+      <img src="favicon-64.png" width="64" height="64" alt="64">
+      <img src="appicon-256.png" width="64" height="64" alt="256">
+    </div>
+    <div class="file">favicon.ico / favicon-16/32/48/64.png — 浏览器标签页;appicon-256/512.png — 桌面/Wails 图标</div>
+  </div>
+</main>
+</body>
+</html>

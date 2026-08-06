@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  easyssh — 主图标 (Logo Mark)
+  概念:盾牌 = 证书安全;钥匙 = SSH 密钥/私钥;开口钥匙环 + 旋转箭头 = 自动续期循环。
+  配色:深空蓝(信任/技术)+ 终端绿(SSL/终端/续期成功)。
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="easyssh">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#17456F"/>
+      <stop offset="1" stop-color="#0A1F38"/>
+    </linearGradient>
+    <linearGradient id="key" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3DDC97"/>
+      <stop offset="1" stop-color="#1E9E5A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景圆角方形 -->
+  <rect x="20" y="20" width="472" height="472" rx="118" fill="url(#bg)"/>
+
+  <!-- 盾牌(白色)—— 证书安全 -->
+  <path d="M 156 172
+           Q 156 140 188 140
+           L 324 140
+           Q 356 140 356 172
+           L 356 274
+           Q 356 346 308 380
+           L 256 414
+           L 204 380
+           Q 156 346 156 274
+           Z"
+        fill="#F8FAFC"/>
+
+  <!-- 钥匙环:开口环(顶部缺口)—— 自动续期循环 -->
+  <path d="M 275.4 206.3 A 46 46 0 1 1 236.6 206.3"
+        fill="none" stroke="url(#key)" stroke-width="15" stroke-linecap="round"/>
+
+  <!-- 旋转箭头(白色,嵌于缺口内) -->
+  <polygon points="256,184 244,206 268,206" fill="#FFFFFF"/>
+
+  <!-- 钥匙杆 -->
+  <path d="M 256 248 V 368" stroke="url(#key)" stroke-width="20" stroke-linecap="round"/>
+
+  <!-- 钥匙齿 -->
+  <rect x="266" y="294" width="28" height="14" rx="7" fill="url(#key)"/>
+  <rect x="266" y="328" width="22" height="14" rx="7" fill="url(#key)"/>
+</svg>

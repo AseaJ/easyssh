@@ -2,6 +2,7 @@
 package main
 
 import (
+	"context"
 	"embed"
 	"log"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	"github.com/asea/easyssh/internal/app"
 
@@ -30,6 +32,23 @@ func main() {
 	log.SetOutput(a.LogWriter())
 	legoLog.Logger = log.New(a.LogWriter(), "", log.LstdFlags)
 
+	// 注入 Wails runtime 桥接(托盘菜单"打开界面/退出"需要)
+	app.InjectWailsHooks(
+		func(ctx context.Context) { runtime.WindowShow(ctx) },
+		func(ctx context.Context) { runtime.WindowHide(ctx) },
+		func(ctx context.Context) { runtime.Quit(ctx) },
+	)
+
+	// --autostart:开机自启模式,启动即隐藏窗口,直接进托盘后台运行
+	startHidden := false
+	for _, arg := range os.Args[1:] {
+		if arg == "--autostart" {
+			startHidden = true
+			a.SetAutostartMode()
+			break
+		}
+	}
+
 	err = wails.Run(&options.App{
 		Title:     "easyssh 证书托管",
 		Width:     1160,
@@ -42,12 +61,16 @@ func main() {
 		// 与前端暗色背景同步;前端会按自身主题渲染,此处仅作启动底色
 		BackgroundColour: &options.RGBA{R: 30, G: 30, B: 30, A: 1},
 		Windows: &windows.Options{
-			Theme:            windows.SystemDefault, // 跟随系统深浅色
+			Theme:               windows.SystemDefault, // 跟随系统深浅色
 			WebviewIsTransparent: false,
 			// Windows 11 22621+:窗口背景用 Mica 材质,与前端毛玻璃面板呼应
 			BackdropType: windows.Mica,
 		},
-		OnStartup: a.Startup,
+		StartHidden:      startHidden, // 开机自启时直接后台
+		HideWindowOnClose: false,      // 关窗走 OnBeforeClose 拦截:隐藏到托盘(不用 Wails 自带的纯隐藏,因无法移任务栏按钮)
+		OnStartup:        a.Startup,
+		OnBeforeClose:    a.BeforeClose,
+		OnShutdown:       a.OnShutdown,
 		Bind: []interface{}{
 			a,
 		},
