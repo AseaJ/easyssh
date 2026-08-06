@@ -1,0 +1,40 @@
+# easyssh 服务器端(守护进程)示例编排
+#
+# 用法:
+#   cp easyssh.yaml.example easyssh.yaml   # 编辑配置(见 docs/server-deploy.md)
+#   docker compose up -d
+#
+# ⚠️ 容器内相对路径以配置文件所在目录(/app/config)为基准解析,而该目录是只读挂载。
+#    所以 easyssh.yaml 里以下路径必须写**绝对路径**(都落在可写的数据卷 /app/data 下):
+#       ca.account_key: /app/data/account.key
+#       certificates[].storage.dir: /app/data/certs/<name>
+#       hosts[].known_hosts: /app/data/known_hosts(用 ssh-keyscan 生成后放入 ./data/)
+#   否则会在只读的 /app/config 下创建目录而失败(见 docs/server-deploy.md「常见问题」)。
+#
+# 说明:
+#   - 只挂载 easyssh.yaml 为只读文件;数据目录(account.key / certs/ / pid)用卷持久化
+#   - 容器以 nonroot 用户运行,数据卷属主需为 65532(distroless nonroot)
+#     —— 首次启动若报权限错误:chown -R 65532:65532 ./data
+#   - http-01 挑战需把宿主机 80 端口映射进容器(供 Let's Encrypt 回访)
+#     dns-01 挑战无需 80 端口,可去掉 ports 段
+#   - 每次改 easyssh.yaml 后:docker compose up -d --force-recreate 重新加载
+
+services:
+  easyssh:
+    build: .
+    image: easyssh:local
+    container_name: easyssh
+    restart: unless-stopped
+    volumes:
+      - ./easyssh.yaml:/app/config/easyssh.yaml:ro   # 配置:只读挂载
+      - ./data:/app/data                              # 数据:卷持久化
+    ports:
+      - "80:80"   # http-01 挑战监听(LE 会访问 http://<域名>/.well-known/acme-challenge/...)
+    # 密钥用环境变量注入,不要写进配置文件:
+    # environment:
+    #   - DNSPOD_TOKEN=xxx
+    #   - SMTP_AUTH_CODE=xxx
+    # 或使用 .env 文件(compose 自动读取,勿提交到 git):
+    # env_file: .env
+    # 对外提供 nginx 部署时,把证书落盘目录挂进 nginx 容器共享:
+    #   - ./data/certs:/etc/nginx/ssl:ro

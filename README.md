@@ -1,5 +1,9 @@
 # easyssh — 证书自动化托管工具
 
+<p align="center">
+  <img src="assets/logo/banner.svg" alt="easyssh — Automatic HTTPS certificates for your servers" width="100%">
+</p>
+
 [![Go Version](https://img.shields.io/badge/Go-1.25-blue)](https://go.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 <!-- 仓库创建后取消注释并替换路径:
@@ -16,10 +20,12 @@ easyssh 是一个证书自动化托管工具:自动签发(ACME)、自动续期�
 | 形态 | Windows | Linux | macOS |
 |---|---|---|---|
 | CLI(headless) | ✅ | ✅(交叉编译) | ✅(交叉编译) |
+| CLI 服务器部署 | ✅ | ✅ [Docker / systemd](docs/server-deploy.md) | ✅ [Docker / systemd](docs/server-deploy.md) |
 | GUI(Wails) | ✅ | ⚠️ 需 webkit2gtk,密钥持久化暂缺 | ⚠️ 需 webkit2gtk |
 
 - Linux/macOS 的 CLI 可在 Windows 上交叉编译(`GOOS=linux GOARCH=amd64 go build ./cmd/easyssh`)
 - Linux/macOS GUI 桌面端:密钥持久化(Windows 注册表)在非 Windows 平台暂未实现,密钥需通过环境变量注入
+- **服务器端**:`easyssh serve` 守护进程与桌面端共用同一核心,功能一致;一键部署见 [Docker Compose / systemd](docs/server-deploy.md)
 
 ## 功能特性
 
@@ -90,6 +96,23 @@ easyssh serve -c easyssh.yaml --pidfile easyssh.pid
 easyssh renew <name> -c easyssh.yaml
 easyssh-app          # GUI
 ```
+
+## 服务器端部署(Docker / systemd)
+
+`easyssh serve` 守护进程与桌面端共用同一套核心逻辑,**功能完全一致**(签发/续期/部署/告警),
+适合跑在 Linux 服务器上长期托管证书。仓库提供现成模板:
+
+```bash
+# Docker Compose 方式
+cp easyssh.yaml.example easyssh.yaml
+cp deploy/docker-compose.yml .
+docker compose up -d --build
+
+# 裸机 systemd 方式(单元模板见 deploy/easyssh.service)
+```
+
+完整步骤、服务器端配置差异(http-01 的 80 端口、dns-01、密钥环境变量注入)、
+与宿主机 nginx 共享证书、运维命令与 FAQ 见 **[`docs/server-deploy.md`](docs/server-deploy.md)**。
 
 ## 导出 / 导入(多客户端共用配置)
 
@@ -189,3 +212,7 @@ certs/example/
 ## 许可证
 
 MIT
+
+## 品牌 Logo
+
+Logo 体系(主图标 / 主标 / 单色 / 仓库横幅 / favicon)见 [`docs/logo-guide.md`](docs/logo-guide.md),源文件位于 [`assets/logo/`](assets/logo/),可浏览器直接打开 `assets/logo/logo-preview.html` 预览全套。

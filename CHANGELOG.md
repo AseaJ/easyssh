@@ -4,6 +4,14 @@
 
 ## [Unreleased]
 
+### 新增
+
+- 服务器端部署模板(Docker / systemd),`serve` 守护进程与桌面端共用同一核心,功能一致:
+  - `Dockerfile`(多阶段构建 + distroless nonroot 精简镜像)与 `.dockerignore`
+  - `deploy/docker-compose.yml`(配置只读挂载、数据卷持久化、密钥环境变量注入)
+  - `deploy/easyssh.service`(systemd 单元,含安全加固与 `CAP_NET_BIND_SERVICE`)
+  - 部署指南 [`docs/server-deploy.md`](docs/server-deploy.md):http-01 的 80 端口要求、dns-01 免端口方案、与宿主机 nginx 共享证书、运维命令与 FAQ
+
 ### 安全
 
 - SSH 部署改为强制 known_hosts 校验:未配置或指纹不匹配时拒绝连接,防中间人攻击

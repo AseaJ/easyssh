@@ -1,0 +1,38 @@
+# easyssh systemd 服务单元示例(守护进程常驻)
+# 安装:
+#   sudo cp easyssh.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now easyssh
+#
+# 要求:easyssh 二进制放在 /opt/easyssh/easyssh,配置在 /opt/easyssh/easyssh.yaml
+# 密钥通过 EnvironmentFile 注入(文件权限 0600,属主 root)
+
+[Unit]
+Description=easyssh certificate auto-manager (ACME issue/renew/deploy)
+Documentation=https://github.com/asea/easyssh
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=easyssh
+Group=easyssh
+WorkingDirectory=/opt/easyssh
+ExecStart=/opt/easyssh/easyssh serve -c /opt/easyssh/easyssh.yaml --pidfile /opt/easyssh/data/easyssh.pid
+Restart=on-failure
+RestartSec=10
+# 密钥/授权码从 /opt/easyssh/easyssh.env 读取(该文件勿提交 git)
+EnvironmentFile=-/opt/easyssh/easyssh.env
+# 安全加固
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/easyssh/data
+# http-01 挑战需要 80 端口
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+# dns-01 挑战(无 80 端口需求)可去掉上面两行
+
+[Install]
+WantedBy=multi-user.target

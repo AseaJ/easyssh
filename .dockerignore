@@ -1,0 +1,19 @@
+# 运行数据与产物(绝不进镜像)
+.git
+.idea
+.reasonix
+*.exe
+*.pid
+*.log
+*.zsbundle
+dist/
+data/
+certs/
+easyssh.yaml
+go-zs.yaml
+.env
+cmd/easyssh-app/frontend/node_modules/
+cmd/easyssh-app/frontend/dist/
+cmd/easyssh-app/frontend/build/
+cmd/easyssh-app/wails.json
+cmd/easyssh-app/frontend/package.json.md5
