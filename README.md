@@ -15,6 +15,20 @@ easyssh 是一个证书自动化托管工具:自动签发(ACME)、自动续期�
 
 > ⚠️ 默认连接 Let's Encrypt **staging** 环境,请先跑通后再切换到正式环境。
 
+## 界面预览
+
+桌面 GUI(Wails 构建,Windows / macOS / Linux)覆盖概览、配置、通知、日志四大视图:
+
+| 概览 | 配置 |
+| :---: | :---: |
+| ![概览](docs/screenshots/gui-overview.png) | ![配置](docs/screenshots/gui-config.png) |
+
+| 通知 | 日志 |
+| :---: | :---: |
+| ![通知](docs/screenshots/gui-notify.png) | ![日志](docs/screenshots/gui-logs.png) |
+
+> 截图数据均为 mock 示例,展示界面风格与功能布局。
+
 ## 平台支持
 
 | 形态 | Windows | Linux | macOS |
