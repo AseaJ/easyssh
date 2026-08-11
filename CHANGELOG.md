@@ -2,6 +2,12 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/) 与 [Semantic Versioning](https://semver.org/lang/zh-CN/)。
 
+## [Unreleased]
+
+### 修复
+
+- **导入 `--conflict append` 证书产物丢失**:冲突条目改名(如 `example` → `example-2`)后,证书产物(privkey/fullchain 等)不再被静默丢弃,改为落到改名后新条目的 `storage.dir`;同时修复合并时切片共享导致包内配置被反向修改的隐患
+
 ## [0.2.0] - 2026-08-06
 
 ### 新增

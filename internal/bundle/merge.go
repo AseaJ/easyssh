@@ -95,8 +95,9 @@ func ApplyImport(b *Bundle, opts MergeOptions) (*ImportResult, error) {
 	if err != nil {
 		return nil, err
 	}
-	// 2. 证书条目合并(host_ref 联动改名)
-	res.ImportedCerts, err = mergeCerts(tcfg, bcfg, opts.Conflict, renameMap)
+	// 2. 证书条目合并(host_ref 联动改名),得条目改名映射(包内名 → 目标名)
+	var certRenames map[string]string
+	res.ImportedCerts, certRenames, err = mergeCerts(tcfg, bcfg, opts.Conflict, renameMap)
 	if err != nil {
 		return nil, err
 	}
@@ -112,9 +113,9 @@ func ApplyImport(b *Bundle, opts MergeOptions) (*ImportResult, error) {
 		res.EnvSecrets = sortedKeys(b.Secrets.Env)
 		res.MissingEnv = append(res.MissingEnv, missing...)
 	}
-	// 4. 证书产物
+	// 4. 证书产物(按改名映射落到新条目的 storage.dir,避免 append 改名后产物丢失)
 	if len(b.Certs) > 0 {
-		if err := applyCerts(b.Certs, tcfg, opts.TargetBase); err != nil {
+		if err := applyCerts(b.Certs, tcfg, opts.TargetBase, certRenames); err != nil {
 			return nil, err
 		}
 	}
@@ -196,13 +197,16 @@ func mergeHosts(t, b *config.Config, mode ConflictMode) (imported, renamed, skip
 }
 
 // mergeCerts 合并证书条目;hostRefRenames 为 hosts 改名映射(原 → 新),同步更新 deploy.host_ref。
-func mergeCerts(t, b *config.Config, mode ConflictMode, hostRefRenames map[string]string) (imported []string, err error) {
+// 返回导入的条目名与条目改名映射(包内原名 → 目标新名,仅 append 冲突改名时记录);
+// 供 applyCerts 把包内证书产物落到改名后条目的 storage.dir。
+func mergeCerts(t, b *config.Config, mode ConflictMode, hostRefRenames map[string]string) (imported []string, certRenames map[string]string, err error) {
 	existing := map[string]bool{}
 	for i := range t.Certificates {
 		existing[t.Certificates[i].Name] = true
 	}
+	certRenames = map[string]string{}
 	for i := range b.Certificates {
-		cc := b.Certificates[i]
+		cc := cloneCertificate(b.Certificates[i])
 		applyHostRefRenames(&cc, hostRefRenames)
 		name := cc.Name
 		switch {
@@ -215,6 +219,7 @@ func mergeCerts(t, b *config.Config, mode ConflictMode, hostRefRenames map[strin
 			cc.Name = newName
 			t.Certificates = append(t.Certificates, cc)
 			imported = append(imported, newName)
+			certRenames[name] = newName
 			existing[newName] = true
 		case mode == ConflictOverwrite:
 			for j := range t.Certificates {
@@ -227,7 +232,19 @@ func mergeCerts(t, b *config.Config, mode ConflictMode, hostRefRenames map[strin
 		default: // ConflictSkip
 		}
 	}
-	return imported, nil
+	return imported, certRenames, nil
+}
+
+// cloneCertificate 深拷贝证书条目,避免合并时共享 Deploy/Domains/DNSProviderOpts
+// 导致 applyHostRefRenames 等修改反向污染包内配置。
+func cloneCertificate(c config.CertificateConfig) config.CertificateConfig {
+	c.Domains = append([]string(nil), c.Domains...)
+	c.DNSProviderOpts = make(map[string]string, len(c.DNSProviderOpts))
+	for k, v := range c.DNSProviderOpts {
+		c.DNSProviderOpts[k] = v
+	}
+	c.Deploy = append([]config.DeployConfig(nil), c.Deploy...)
+	return c
 }
 
 // applyHostRefRenames 把证书条目 deploy 中的 host_ref 按映射改名。
@@ -279,14 +296,20 @@ func applySecrets(sp *SecretsPayload, t *config.Config, targetBase string, persi
 }
 
 // applyCerts 将包内证书产物写入目标配置各条目 storage.dir(条目未导入时跳过)。
+// certRenames 为包内原名 → 目标名的改名映射(append 冲突改名),按映射解析目录,
+// 保证产物落到改名后条目的 storage.dir 而非丢失或误写同名旧条目。
 // storage.dir 为相对路径时基于 targetBase 解析。
-func applyCerts(certs map[string]map[string][]byte, t *config.Config, targetBase string) error {
+func applyCerts(certs map[string]map[string][]byte, t *config.Config, targetBase string, certRenames map[string]string) error {
 	dirByName := map[string]string{}
 	for i := range t.Certificates {
 		dirByName[t.Certificates[i].Name] = resolvePath(targetBase, t.Certificates[i].Storage.Dir)
 	}
 	for name, files := range certs {
-		dir, ok := dirByName[name]
+		targetName := name
+		if nn, ok := certRenames[name]; ok {
+			targetName = nn
+		}
+		dir, ok := dirByName[targetName]
 		if !ok {
 			continue
 		}

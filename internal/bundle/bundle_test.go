@@ -357,6 +357,15 @@ func TestApplyImportConflictAppend(t *testing.T) {
 	if !found {
 		t.Errorf("host_ref 应联动改为 prod-2, got %v", refs)
 	}
+	// 证书产物应落到改名后条目 example-2 的 storage.dir(./certs/example),
+	// 而不是同名旧条目 example 的目录(./certs/old)
+	newDir := filepath.Join(target, "certs", "example")
+	if _, err := os.Stat(filepath.Join(newDir, "fullchain.pem")); err != nil {
+		t.Errorf("append 改名后证书产物未落盘到新条目目录: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(target, "certs", "old", "fullchain.pem")); err == nil {
+		t.Error("旧条目 example 的产物目录不应被覆盖写入")
+	}
 }
 
 func TestApplyImportConflictSkip(t *testing.T) {

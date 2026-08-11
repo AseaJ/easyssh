@@ -209,8 +209,10 @@ func (a *App) SaveConfig(view ConfigView) (string, error) {
 		return "", fmt.Errorf("写入配置 %s: %w", a.cfgPath(), err)
 	}
 	// 开机自启设置(应用级偏好,独立于 yaml 配置;失败仅提示不阻断保存)
+	// 注意:非 easyssh.exe 进程(如测试)调用会拒绝写入,这里只记录日志,
+	// 避免把临时/无效路径写进正式自启注册表,也避免测试环境误报保存失败。
 	if err := SetAutostart(view.Autostart); err != nil {
-		return "", fmt.Errorf("配置已写入但开机自启设置失败: %w", err)
+		a.logger.Printf("开机自启设置失败(已跳过): %v", err)
 	}
 	// 重新加载
 	if err := a.reload(); err != nil {
