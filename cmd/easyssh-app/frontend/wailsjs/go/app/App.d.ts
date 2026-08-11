@@ -5,6 +5,8 @@ import {logring} from '../models';
 import {io} from '../models';
 import {frontend} from '../models';
 
+export function CheckForUpdate():Promise<app.UpdateInfo>;
+
 export function Deploy(arg1:string):Promise<string>;
 
 export function ExportBundle(arg1:app.ExportRequest):Promise<app.ExportResult>;
@@ -23,11 +25,11 @@ export function ListCertificates():Promise<Array<app.CertView>>;
 
 export function LogWriter():Promise<io.Writer>;
 
+export function OpenUpdatePage():Promise<void>;
+
 export function PreviewImportBundle(arg1:app.ImportPreviewRequest):Promise<app.ImportPreview>;
 
 export function QuitFromTray():Promise<void>;
-
-export function RebuildAndRestart():Promise<string>;
 
 export function ReloadConfig():Promise<string>;
 

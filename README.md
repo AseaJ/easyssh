@@ -78,13 +78,26 @@ easyssh 是一个证书自动化托管工具:自动签发(ACME)、自动续期�
 环境要求:Go 1.25+;GUI 另需 Node.js 18+、Wails v2 依赖(Windows: WebView2;Linux: webkit2gtk)。
 
 ```bash
-# CLI
-go build -o easyssh.exe ./cmd/easyssh
+# CLI(版本号通过 ldflags 注入,更新检测依赖它)
+go build -ldflags "-X main.version=v0.2.1" -o easyssh.exe ./cmd/easyssh
 
 # GUI(桌面应用)
 cd cmd/easyssh-app
-wails build   # 产出 build/bin/easyssh(.exe)
+wails build -ldflags "-X github.com/asea/easyssh/internal/app.BuildVersion=v0.2.1"  # 产出 build/bin/easyssh(.exe)
 ```
+
+## 更新(update)
+
+程序内置了版本更新检测与提示(数据源:GitHub Releases):
+
+- **CLI**:`easyssh serve` 启动时后台检查新版本并打印提示;`easyssh update` 一键更新
+  (下载对应平台二进制 → 与 `checksums.txt` 核对 sha256 → 替换当前程序):
+  - `easyssh update` — 检测到新版本则下载并替换(会先确认)
+  - `easyssh update --check` — 仅检查是否有新版本
+  - `easyssh update --yes` — 跳过确认(CI/无人值守)
+  - `easyssh update --dir <目录>` — 指定安装目录(默认当前程序所在目录)
+- **GUI**:启动时后台检测,概览页顶部出现"发现新版本"提示条,点击跳转 GitHub Release 页;
+  用户手动下载新版本替换即可(桌面端暂无自动替换,避免覆盖运行中 exe 的风险)
 
 ## 快速开始
 

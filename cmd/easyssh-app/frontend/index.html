@@ -20,7 +20,6 @@
       <div class="actions">
         <button id="btn-scan" class="btn" title="仅检查各证书状态,不会触发续期或部署">立即扫描</button>
         <button id="btn-reload" class="btn ghost">重载配置</button>
-        <button id="btn-rebuild" class="btn ghost">重建并重启</button>
         <button id="btn-theme" class="btn ghost icon-btn" title="切换主题" aria-label="切换主题">
           <svg id="icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
             <circle cx="12" cy="12" r="4.5"/>
@@ -35,6 +34,7 @@
 
     <!-- 概览视图 -->
     <section id="view-overview">
+      <div id="update-banner" class="update-banner hidden"></div>
       <div id="overview" class="cards"></div>
       <div class="panel">
         <div class="panel-head">

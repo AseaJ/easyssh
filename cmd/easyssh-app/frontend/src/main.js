@@ -81,6 +81,44 @@ async function refresh() {
   }
 }
 
+// ---------- 更新提示 ----------
+const updateBannerEl = document.getElementById("update-banner");
+let updateDismissed = false; // 本次会话内用户已关闭提示(关闭后不再自动弹出)
+
+async function refreshUpdateBanner() {
+  if (updateDismissed) return;
+  let info;
+  try {
+    info = await go().CheckForUpdate();
+  } catch (e) {
+    return; // 绑定不存在/调用失败时静默
+  }
+  if (!info.check_done) return; // 检查进行中,等下次轮询
+  if (info.has_update) {
+    updateBannerEl.classList.remove("hidden");
+    updateBannerEl.innerHTML = `
+      <span class="banner-icon">🆕</span>
+      <span class="banner-text">发现新版本 <b>${esc(info.latest)}</b>(当前 ${esc(info.current || "未知")}),点击查看更新内容</span>
+      <span class="banner-action">查看 Release →</span>
+      <button class="banner-close" title="关闭" aria-label="关闭">✕</button>`;
+  } else {
+    updateBannerEl.classList.add("hidden");
+  }
+}
+
+updateBannerEl.addEventListener("click", (e) => {
+  if (e.target.classList.contains("banner-close")) {
+    updateDismissed = true;
+    updateBannerEl.classList.add("hidden");
+    return;
+  }
+  go().OpenUpdatePage();
+});
+
+// 启动后延迟触发更新检查轮询(给后端留出启动时间),之后 30s 一次
+setTimeout(refreshUpdateBanner, 3000);
+setInterval(refreshUpdateBanner, 30000);
+
 function renderOverview(ov) {
   const cards = [
     { label: "托管证书", num: ov.total, cls: "blue" },
@@ -1164,27 +1202,6 @@ document.getElementById("btn-reload").addEventListener("click", async () => {
     await refresh();
   } catch (err) {
     toast(String(err), false);
-  }
-});
-
-// 重建并重启:后端执行 wails build → 生成重启脚本,成功后本进程退出,脚本用新 exe 重启
-document.getElementById("btn-rebuild").addEventListener("click", async () => {
-  const btn = document.getElementById("btn-rebuild");
-  if (!confirm("将重新构建 GUI(wails build)并自动重启应用。\n构建期间界面会卡住数秒,重启后自动生效。\n\n确定继续吗?")) return;
-  btn.disabled = true;
-  const orig = btn.textContent;
-  btn.textContent = "构建中…";
-  try {
-    const msg = await go().RebuildAndRestart();
-    toast(msg);
-    // 给 toast 一点展示时间后退出,重启脚本接管
-    setTimeout(() => {
-      try { window.runtime.Quit(); } catch (e) { /* 忽略 */ }
-    }, 1500);
-  } catch (err) {
-    toast("重建失败: " + err, false);
-    btn.disabled = false;
-    btn.textContent = orig;
   }
 });
 

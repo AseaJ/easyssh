@@ -368,6 +368,30 @@ export namespace app {
 	        this.known_hosts = source["known_hosts"];
 	    }
 	}
+	export class UpdateInfo {
+	    current: string;
+	    latest: string;
+	    release_url: string;
+	    has_update: boolean;
+	    check_done: boolean;
+	    error?: string;
+	    checked_at?: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new UpdateInfo(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.current = source["current"];
+	        this.latest = source["latest"];
+	        this.release_url = source["release_url"];
+	        this.has_update = source["has_update"];
+	        this.check_done = source["check_done"];
+	        this.error = source["error"];
+	        this.checked_at = source["checked_at"];
+	    }
+	}
 
 }
 
