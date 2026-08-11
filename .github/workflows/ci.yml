@@ -56,7 +56,7 @@ jobs:
           go build -o dist/easyssh ./cmd/easyssh
 
       - name: 上传构建产物
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: easyssh-${{ matrix.goos }}-${{ matrix.arch }}
           path: dist/
