@@ -19,6 +19,20 @@ import (
 	"github.com/asea/easyssh/internal/storage"
 )
 
+// BuildVersion 是构建期注入的版本号(GUI/CLI 共用)。
+// 构建时通过 -ldflags "-X github.com/asea/easyssh/internal/app.BuildVersion=vX.Y.Z" 注入;
+// 未注入时为空(视为开发版),AppVersion 返回 "",更新检测对空版本不提示(与 CLI 默认一致)。
+var BuildVersion = ""
+
+// AppVersion 返回当前程序版本号(归一化为 v 前缀,供更新检测比较)。
+func AppVersion() string {
+	v := BuildVersion
+	if v != "" && v[0] != 'v' {
+		v = "v" + v
+	}
+	return v
+}
+
 // App 是 Wails 前端可调用的应用对象。
 // 前端通过 window.go.app.App.<Method> 访问导出方法。
 type App struct {
@@ -38,6 +52,10 @@ type App struct {
 	tray       *trayHandle   // Windows 托盘图标(非 Windows 为 nil)
 	quitting   bool          // 托盘"退出"标志:置 true 后 runtime.Quit 不被 OnBeforeClose 拦截
 	autostartMode bool       // --autostart 启动:开机自启模式,窗口默认隐藏
+
+	updateMu        sync.Mutex // 保护 updateCheckedAt(更新检测节流)
+	updateCheckedAt time.Time  // 最近一次发起更新检测的时间
+	updateState     updateState // 更新检测结果缓存(内部自带锁)
 }
 
 // snap 返回当前配置与调度器的快照指针。reload 总是构造新对象后原子替换指针,
@@ -94,6 +112,8 @@ func (a *App) Startup(ctx context.Context) {
 	}
 	// 缓存主窗口 hwnd(供托盘"打开界面/隐藏"切换任务栏按钮;StartHidden 时窗口未显示,延迟到首次显示)
 	cacheMainWindow()
+	// 后台检查新版本(不阻塞启动;检测结果由前端 CheckForUpdate 轮询获取)
+	go a.checkUpdate(ctx, 24*time.Hour)
 }
 
 // autoLoop 自动调度循环:每 1 分钟检查一次是否到 check_interval,到点执行全量扫描。

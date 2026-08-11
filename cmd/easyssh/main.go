@@ -50,6 +50,7 @@ func newRootCmd() *cobra.Command {
 	root.AddCommand(newExportCmd())
 	root.AddCommand(newImportCmd())
 	root.AddCommand(newAutostartCmd())
+	root.AddCommand(newUpdateCmd())
 	return root
 }
 
@@ -287,6 +288,8 @@ func newServeCmd() *cobra.Command {
 			defer stop()
 
 			logger.Printf("easyssh serve 启动,调度配置: %s", sched.Describe())
+			// 启动时异步检查新版本,不阻塞守护进程
+			checkAndPrintUpdate(ctx, logger)
 			interval := cfg.Schedule.CheckInterval.Std()
 			for {
 				reports := sched.RunOnce(ctx)
