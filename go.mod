@@ -6,7 +6,7 @@ require (
 	github.com/go-acme/lego/v4 v4.35.2
 	github.com/pkg/sftp v1.13.11
 	github.com/spf13/cobra v1.10.2
-	github.com/wailsapp/wails/v2 v2.13.0
+	github.com/wailsapp/wails/v2 v2.14.0
 	golang.org/x/crypto v0.54.0
 	golang.org/x/mod v0.37.0
 	golang.org/x/sys v0.47.0
